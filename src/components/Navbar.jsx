@@ -32,16 +32,12 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
               Genoma IA
             </button>
 
-            {/* Highlighted Creador IA Button */}
+            {/* Permanent Primary Solid Creador IA Button */}
             <button
               onClick={() => setActiveTab('builder')}
-              className={`px-4 py-2 rounded-xl text-sm font-extrabold flex items-center space-x-1.5 transition-all shadow-md ${
-                activeTab === 'builder'
-                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 shadow-emerald-500/30'
-                  : 'bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border border-emerald-500/30 hover:from-emerald-500 hover:to-cyan-500 hover:text-zinc-950'
-              }`}
+              className="px-4 py-2 rounded-full text-sm font-black flex items-center space-x-1.5 bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 shadow-lg shadow-emerald-500/25 hover:from-emerald-400 hover:to-cyan-400 active:scale-95 transition-all"
             >
-              <Dumbbell className="w-4 h-4" />
+              <Dumbbell className="w-4 h-4 text-zinc-950 font-bold" />
               <span>Creador IA</span>
             </button>
 
@@ -144,7 +140,7 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
             activeTab === 'builder' ? 'text-emerald-500 font-bold' : 'text-zinc-500 dark:text-zinc-400'
           }`}
         >
-          <Dumbbell className="w-4 h-4 mb-0.5" />
+          <Dumbbell className="w-4 h-4 mb-0.5 text-emerald-400" />
           Creador
         </button>
         <button

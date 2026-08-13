@@ -566,3 +566,43 @@ export function getRecommendedExercises({ equipment = 'gym', muscleGroups = [], 
     return true;
   });
 }
+
+export const UPPER_BODY_MUSCLES = ['chest', 'back', 'shoulders', 'biceps', 'triceps'];
+export const LOWER_BODY_MUSCLES = ['quads', 'hamstrings', 'glutes', 'calves', 'abs'];
+
+export function isUpperBodyExercise(exercise) {
+  if (!exercise || !exercise.muscleGroup) return false;
+  return UPPER_BODY_MUSCLES.includes(exercise.muscleGroup.toLowerCase());
+}
+
+export function isLowerBodyExercise(exercise) {
+  if (!exercise || !exercise.muscleGroup) return false;
+  return LOWER_BODY_MUSCLES.includes(exercise.muscleGroup.toLowerCase());
+}
+
+/**
+ * Re-orders a list of exercises for a Full Body Biseries workout
+ * so that each biserie pair alternates between Upper Body and Lower Body / Core.
+ * Example: Pair 1: Upper + Lower, Pair 2: Upper + Lower, etc.
+ */
+export function organizeBiseriesForFullbody(exercises) {
+  if (!Array.isArray(exercises) || exercises.length === 0) return exercises;
+
+  const upperList = exercises.filter(ex => isUpperBodyExercise(ex));
+  const lowerList = exercises.filter(ex => !isUpperBodyExercise(ex));
+
+  const result = [];
+  const maxLength = Math.max(upperList.length, lowerList.length);
+
+  for (let i = 0; i < maxLength; i++) {
+    if (i < upperList.length) {
+      result.push(upperList[i]);
+    }
+    if (i < lowerList.length) {
+      result.push(lowerList[i]);
+    }
+  }
+
+  return result;
+}
+

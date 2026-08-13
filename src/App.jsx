@@ -14,7 +14,7 @@ import { useAuth } from './hooks/useAuth';
 import { useUserProfile } from './hooks/useUserProfile';
 import { useLoadLog } from './hooks/useLoadLog';
 import { useWorkoutSession } from './hooks/useWorkoutSession';
-import { getRecommendedExercises, getRecommendedMethodologyForTime } from './data/exerciseDatabase';
+import { getRecommendedExercises, getRecommendedMethodologyForTime, organizeBiseriesForFullbody, isUpperBodyExercise, isLowerBodyExercise } from './data/exerciseDatabase';
 
 export function App() {
   const authHooks = useAuth();
@@ -48,18 +48,25 @@ export function App() {
 
   // Launch pre-workout when user clicks a specific Split Day card in Genoma IA
   const handleSelectSplitDay = (dayItem) => {
-    const recommended = getRecommendedExercises({
+    let recommended = getRecommendedExercises({
       equipment: profile.equipment || 'gym',
       muscleGroups: dayItem.muscles,
       protectedZones: profile.protectedZones || []
     });
 
     const methodology = getRecommendedMethodologyForTime(profile.sessionTime || 45);
+    const isFullBody = (dayItem.title && dayItem.title.toLowerCase().includes('full body')) ||
+                       (recommended.some(ex => isUpperBodyExercise(ex)) && recommended.some(ex => isLowerBodyExercise(ex)));
+
+    if (methodology === 'biseries' && isFullBody) {
+      recommended = organizeBiseriesForFullbody(recommended);
+    }
 
     setPendingWorkoutConfig({
       exercises: recommended,
       methodology,
-      dayLabel: dayItem.day
+      dayLabel: dayItem.day,
+      isFullBody
     });
     setIsVibeCheckOpen(true);
   };
@@ -71,7 +78,15 @@ export function App() {
         ? pendingWorkoutConfig.methodology
         : getRecommendedMethodologyForTime(sessionDuration);
 
-      startSession(pendingWorkoutConfig.exercises, effectiveMethodology, vibe, sessionDuration);
+      let finalExercises = [...pendingWorkoutConfig.exercises];
+      const isFullBody = pendingWorkoutConfig.isFullBody ||
+        (finalExercises.some(ex => isUpperBodyExercise(ex)) && finalExercises.some(ex => isLowerBodyExercise(ex)));
+
+      if (effectiveMethodology === 'biseries' && isFullBody) {
+        finalExercises = organizeBiseriesForFullbody(finalExercises);
+      }
+
+      startSession(finalExercises, effectiveMethodology, vibe, sessionDuration);
       setIsVibeCheckOpen(false);
       setActiveTab('player');
     }

@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Sparkles, Dumbbell, Zap, Layers, RefreshCw, Trash2, ArrowUp, ArrowDown, Play, Check, Flame, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MUSCLE_GROUPS, METHODOLOGIES, EXERCISE_DATABASE, getRecommendedExercises, getMuscleSpanishName, calculatePersonalizedLoad, getRecommendedMethodologyForTime } from '../data/exerciseDatabase';
+import { MUSCLE_GROUPS, METHODOLOGIES, EXERCISE_DATABASE, getRecommendedExercises, getMuscleSpanishName, calculatePersonalizedLoad, getRecommendedMethodologyForTime, organizeBiseriesForFullbody, isUpperBodyExercise, isLowerBodyExercise } from '../data/exerciseDatabase';
 
 export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
   const [selectedMuscles, setSelectedMuscles] = useState(['chest', 'back']);
@@ -26,17 +26,24 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
 
     let result = [];
     if (selectedMethodology === 'biseries') {
-      const primaryList = recommendedPool.filter(e => e.muscleGroup === selectedMuscles[0]);
-      const secondaryList = recommendedPool.filter(e => e.muscleGroup === (selectedMuscles[1] || selectedMuscles[0]));
+      const hasUpper = recommendedPool.some(e => isUpperBodyExercise(e));
+      const hasLower = recommendedPool.some(e => isLowerBodyExercise(e));
 
-      for (let i = 0; i < Math.min(3, Math.max(primaryList.length, secondaryList.length)); i++) {
-        if (primaryList[i]) result.push(primaryList[i]);
-        if (secondaryList[i]) result.push(secondaryList[i]);
-      }
+      if (hasUpper && hasLower) {
+        result = organizeBiseriesForFullbody(recommendedPool.slice(0, 6));
+      } else {
+        const primaryList = recommendedPool.filter(e => e.muscleGroup === selectedMuscles[0]);
+        const secondaryList = recommendedPool.filter(e => e.muscleGroup === (selectedMuscles[1] || selectedMuscles[0]));
 
-      if (result.length % 2 !== 0 && recommendedPool.length > result.length) {
-        const extra = recommendedPool.find(e => !result.some(r => r.id === e.id));
-        if (extra) result.push(extra);
+        for (let i = 0; i < Math.min(3, Math.max(primaryList.length, secondaryList.length)); i++) {
+          if (primaryList[i]) result.push(primaryList[i]);
+          if (secondaryList[i]) result.push(secondaryList[i]);
+        }
+
+        if (result.length % 2 !== 0 && recommendedPool.length > result.length) {
+          const extra = recommendedPool.find(e => !result.some(r => r.id === e.id));
+          if (extra) result.push(extra);
+        }
       }
     } else {
       result = recommendedPool.slice(0, 5);

@@ -7,15 +7,21 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
-          {/* Logo & Brand */}
+          {/* Logo & Brand + Mobile Sub-Username */}
           <div className="flex items-center space-x-3 cursor-pointer" onClick={() => setActiveTab('builder')}>
             <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
               <Dumbbell className="w-6 h-6 text-zinc-950 font-bold" />
             </div>
             <div>
-              <span className="font-extrabold text-xl tracking-tight text-zinc-900 dark:text-zinc-50">
+              <span className="font-extrabold text-xl tracking-tight text-zinc-900 dark:text-zinc-50 leading-none block">
                 FitFlex <span className="text-emerald-500 dark:text-emerald-400">AI</span>
               </span>
+              {currentUser && (
+                <span className="text-[10px] font-extrabold text-zinc-500 dark:text-zinc-400 flex items-center space-x-1 mt-0.5 md:hidden">
+                  <User className="w-2.5 h-2.5 text-emerald-500 inline flex-shrink-0" />
+                  <span className="truncate max-w-[90px]">{currentUser.username}</span>
+                </span>
+              )}
             </div>
           </div>
 
@@ -85,11 +91,11 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
 
           {/* Right Status Badges & Controls */}
           <div className="flex items-center space-x-2 sm:space-x-3">
-            {/* User Chip */}
+            {/* User Chip (Desktop only) */}
             {currentUser && (
-              <div className="flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-[11px] sm:text-xs font-bold transition-all">
-                <User className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-500 flex-shrink-0" />
-                <span className="text-zinc-800 dark:text-zinc-200 max-w-[70px] sm:max-w-[120px] truncate">
+              <div className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-bold transition-all">
+                <User className="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" />
+                <span className="text-zinc-800 dark:text-zinc-200 max-w-[120px] truncate">
                   {currentUser.username}
                 </span>
               </div>

@@ -73,8 +73,27 @@ export const METHODOLOGIES = [
   }
 ];
 
-// Smart Algorithmic Personalised Load & Reps Calculator
-export function calculatePersonalizedLoad(exercise, gender = 'Hombre', bodyWeightKg = 70, experienceLevel = 'intermediate', goal = 'Hipertrofia') {
+// Smart Time-Based Methodology Recommendation Engine
+export function getRecommendedMethodologyForTime(sessionTimeMinutes = 45) {
+  const mins = parseInt(sessionTimeMinutes) || 45;
+  if (mins <= 30) {
+    return 'circuit'; // EMOM / Circuito Funcional for short express sessions
+  } else if (mins >= 60) {
+    return 'classic'; // Hipertrofia Clásica for extended full sessions
+  } else {
+    return 'biseries'; // Biseries Antagonistas for 45 min standard sessions
+  }
+}
+
+// Smart Algorithmic Personalised Load & Reps Calculator with Methodology Tuning
+export function calculatePersonalizedLoad(
+  exercise,
+  gender = 'Hombre',
+  bodyWeightKg = 70,
+  experienceLevel = 'intermediate',
+  goal = 'Hipertrofia',
+  methodology = 'classic'
+) {
   const isFemale = gender === 'Mujer';
   const bw = parseFloat(bodyWeightKg) || 70;
 
@@ -83,14 +102,37 @@ export function calculatePersonalizedLoad(exercise, gender = 'Hombre', bodyWeigh
   if (experienceLevel === 'beginner') expMultiplier = 0.55;
   if (experienceLevel === 'advanced') expMultiplier = 1.2;
 
+  // Methodology multiplier & reps tuning
+  let methMultiplier = 1.0;
+  let targetReps = '8-10';
+  let defaultRepsNum = 10;
+
+  if (methodology === 'classic') {
+    methMultiplier = 1.0;
+    targetReps = '8-10';
+    defaultRepsNum = 10;
+  } else if (methodology === 'biseries') {
+    methMultiplier = 0.85;
+    targetReps = '10-12';
+    defaultRepsNum = 10;
+  } else if (methodology === 'circuit') {
+    methMultiplier = 0.70;
+    targetReps = '12-15';
+    defaultRepsNum = 12;
+  } else if (methodology === 'dropset') {
+    methMultiplier = 0.95;
+    targetReps = '6-8';
+    defaultRepsNum = 8;
+  }
+
   // Base strength ratio by exercise category & equipment
   let baseRatio = 0.5;
 
   if (exercise.equipment === 'bodyweight') {
     return {
       suggestedWeightKg: 0,
-      targetReps: goal.includes('Definición') ? '15-20' : '10-12',
-      defaultRepsNum: 12
+      targetReps,
+      defaultRepsNum
     };
   }
 
@@ -116,20 +158,10 @@ export function calculatePersonalizedLoad(exercise, gender = 'Hombre', bodyWeigh
     baseRatio = baseRatio * 0.4;
   }
 
-  let calculatedKg = bw * baseRatio * expMultiplier;
+  let calculatedKg = bw * baseRatio * expMultiplier * methMultiplier;
 
   // Round to nearest 2.5kg step
   calculatedKg = Math.max(2.5, Math.round(calculatedKg / 2.5) * 2.5);
-
-  let targetReps = '8-10';
-  let defaultRepsNum = 10;
-  if (goal.includes('Definición') || goal.includes('Grasa')) {
-    targetReps = '12-15';
-    defaultRepsNum = 12;
-  } else if (goal.includes('Fuerza')) {
-    targetReps = '6-8';
-    defaultRepsNum = 8;
-  }
 
   return {
     suggestedWeightKg: calculatedKg,

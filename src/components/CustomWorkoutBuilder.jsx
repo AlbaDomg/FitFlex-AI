@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { Sparkles, Dumbbell, Zap, Layers, RefreshCw, Trash2, ArrowUp, ArrowDown, Play, Check, Flame, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MUSCLE_GROUPS, METHODOLOGIES, EXERCISE_DATABASE, getRecommendedExercises, getMuscleSpanishName, calculatePersonalizedLoad } from '../data/exerciseDatabase';
+import { MUSCLE_GROUPS, METHODOLOGIES, EXERCISE_DATABASE, getRecommendedExercises, getMuscleSpanishName, calculatePersonalizedLoad, getRecommendedMethodologyForTime } from '../data/exerciseDatabase';
 
 export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
   const [selectedMuscles, setSelectedMuscles] = useState(['chest', 'back']);
-  const [selectedMethodology, setSelectedMethodology] = useState('classic');
+  const [selectedMethodology, setSelectedMethodology] = useState(() => getRecommendedMethodologyForTime(profile?.sessionTime || 45));
   const [customExercises, setCustomExercises] = useState([]);
 
   // Filter available exercises based on equipment and protected zones
@@ -159,8 +159,9 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
 
       {/* Methodology Picker Grid */}
       <div className="space-y-3">
-        <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
-          2. Selecciona la Metodología de Entrenamiento
+        <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block flex items-center justify-between">
+          <span>2. Selecciona la Metodología de Entrenamiento</span>
+          <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold">Autoseleccionado según tu límite de {profile?.sessionTime || 45} min</span>
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {METHODOLOGIES.map(meth => {
@@ -270,7 +271,7 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
                   <div className="flex items-center justify-between sm:justify-end space-x-3 border-t sm:border-t-0 pt-3 sm:pt-0 border-zinc-100 dark:border-zinc-800">
                     <div className="text-left sm:text-right">
                       {(() => {
-                        const smartLoad = calculatePersonalizedLoad(ex, profile?.gender, profile?.weight, profile?.experienceLevel, profile?.goal);
+                        const smartLoad = calculatePersonalizedLoad(ex, profile?.gender, profile?.weight, profile?.experienceLevel, profile?.goal, selectedMethodology);
                         return (
                           <>
                             <div className="text-xs font-bold text-zinc-900 dark:text-zinc-200">

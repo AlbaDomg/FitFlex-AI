@@ -49,7 +49,8 @@ export function InWorkoutPlayer({ sessionHooks, profile, onFinishWorkout, onGoTo
     profile?.gender || 'Hombre',
     profile?.weight || 70,
     profile?.experienceLevel || 'intermediate',
-    profile?.goal || 'Hipertrofia'
+    profile?.goal || 'Hipertrofia',
+    methodology || 'classic'
   ) : null;
 
   const [weightInput, setWeightInput] = useState(initialSmartLoad?.suggestedWeightKg || 50);
@@ -65,12 +66,13 @@ export function InWorkoutPlayer({ sessionHooks, profile, onFinishWorkout, onGoTo
         profile?.gender || 'Hombre',
         profile?.weight || 70,
         profile?.experienceLevel || 'intermediate',
-        profile?.goal || 'Hipertrofia'
+        profile?.goal || 'Hipertrofia',
+        methodology || 'classic'
       );
       setWeightInput(smart.suggestedWeightKg);
       setRepsInput(smart.defaultRepsNum);
     }
-  }, [currentLinearIndex, activeExerciseObj, profile]);
+  }, [currentLinearIndex, activeExerciseObj, profile, methodology]);
 
   // Fire celebratory confetti when workout completes
   React.useEffect(() => {

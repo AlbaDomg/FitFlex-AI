@@ -14,7 +14,7 @@ import { useAuth } from './hooks/useAuth';
 import { useUserProfile } from './hooks/useUserProfile';
 import { useLoadLog } from './hooks/useLoadLog';
 import { useWorkoutSession } from './hooks/useWorkoutSession';
-import { getRecommendedExercises } from './data/exerciseDatabase';
+import { getRecommendedExercises, getRecommendedMethodologyForTime } from './data/exerciseDatabase';
 
 export function App() {
   const authHooks = useAuth();
@@ -54,8 +54,7 @@ export function App() {
       protectedZones: profile.protectedZones || []
     });
 
-    const isTorsoOrAntagonist = dayItem.muscles.includes('chest') && dayItem.muscles.includes('back');
-    const methodology = isTorsoOrAntagonist ? 'biseries' : 'classic';
+    const methodology = getRecommendedMethodologyForTime(profile.sessionTime || 45);
 
     setPendingWorkoutConfig({
       exercises: recommended,

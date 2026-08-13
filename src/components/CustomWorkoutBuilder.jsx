@@ -5,7 +5,7 @@ import { MUSCLE_GROUPS, METHODOLOGIES, EXERCISE_DATABASE, getRecommendedExercise
 
 export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
   const [selectedMuscles, setSelectedMuscles] = useState(['chest', 'back']);
-  const [selectedMethodology, setSelectedMethodology] = useState('biseries');
+  const [selectedMethodology, setSelectedMethodology] = useState('classic');
   const [customExercises, setCustomExercises] = useState([]);
 
   // Filter available exercises based on equipment and protected zones

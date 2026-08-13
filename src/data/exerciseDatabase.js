@@ -32,16 +32,6 @@ export const MUSCLE_GROUPS = [
 
 export const METHODOLOGIES = [
   {
-    id: 'biseries',
-    name: 'Biseries Antagonistas',
-    shortName: 'Biserie',
-    badge: 'A1 + A2',
-    description: 'Combina 2 ejercicios de grupos opuestos (ej. Pecho + Espalda) con 10s de descanso entre ellos.',
-    color: 'emerald',
-    defaultRestBetweenPairsSec: 90,
-    defaultRestBetweenExercisesSec: 10
-  },
-  {
     id: 'classic',
     name: 'Hipertrofia Clásica',
     shortName: 'Clásico',
@@ -50,6 +40,16 @@ export const METHODOLOGIES = [
     color: 'cyan',
     defaultRestBetweenPairsSec: 75,
     defaultRestBetweenExercisesSec: 75
+  },
+  {
+    id: 'biseries',
+    name: 'Biseries Antagonistas',
+    shortName: 'Biserie',
+    badge: 'A1 + A2',
+    description: 'Combina 2 ejercicios de grupos opuestos (ej. Pecho + Espalda) con 10s de descanso entre ellos.',
+    color: 'emerald',
+    defaultRestBetweenPairsSec: 90,
+    defaultRestBetweenExercisesSec: 10
   },
   {
     id: 'circuit',

@@ -136,7 +136,7 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
 
       {/* Muscle Selector Grid */}
       <div className="space-y-3">
-        <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block">
+        <label className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block w-full">
           1. Selecciona Grupos Musculares Objetivo
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5">
@@ -163,9 +163,8 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
 
       {/* Methodology Picker Grid */}
       <div className="space-y-3">
-        <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block flex items-center justify-between">
-          <span>2. Selecciona la Metodología de Entrenamiento</span>
-          <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold">Autoseleccionado según tu límite de {profile?.sessionTime || 45} min</span>
+        <label className="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 block w-full">
+          2. Selecciona la Metodología de Entrenamiento
         </label>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {METHODOLOGIES.map(meth => {

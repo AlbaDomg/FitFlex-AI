@@ -123,7 +123,7 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
 
         <button
           onClick={generateAIRoutine}
-          className="px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold flex items-center space-x-2 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-300 dark:border-zinc-700"
+          className="px-4 py-2.5 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 text-xs font-bold flex items-center space-x-2 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all border border-zinc-300 dark:border-zinc-700 self-start md:self-auto"
         >
           <RefreshCw className="w-4 h-4 text-emerald-500" />
           <span>Regenerar Sugerencias IA</span>
@@ -193,24 +193,24 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
         </div>
       </div>
 
-      {/* AI Exercise Cards List & Live Action Bar */}
+      {/* AI Exercise Cards List & Responsive Action Bar */}
       <div className="space-y-4 pt-4 border-t border-zinc-200 dark:border-zinc-800">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <h2 className="text-lg font-extrabold text-zinc-900 dark:text-zinc-100">
-              Rutina Generada por IA ({customExercises.length} Ejercicios)
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center space-x-2.5">
+            <h2 className="text-base sm:text-lg font-extrabold text-zinc-900 dark:text-zinc-100">
+              Rutina Generada ({customExercises.length} Ejercicios)
             </h2>
-            <span className="px-3 py-1 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-xs font-bold border border-cyan-500/20">
-              ~ {estimatedDurationMinutes} Min Totales
+            <span className="px-2.5 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-xs font-bold border border-cyan-500/20 whitespace-nowrap">
+              ~ {estimatedDurationMinutes} min
             </span>
           </div>
 
           <button
             onClick={() => onStartWorkout(customExercises, selectedMethodology)}
             disabled={customExercises.length === 0}
-            className="px-6 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 font-extrabold text-sm flex items-center space-x-2 shadow-lg shadow-emerald-500/25 hover:from-emerald-400 hover:to-cyan-400 transition-all disabled:opacity-50"
+            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 font-extrabold text-xs sm:text-sm flex items-center justify-center space-x-2 shadow-md shadow-emerald-500/20 hover:from-emerald-400 hover:to-cyan-400 transition-all disabled:opacity-50"
           >
-            <Play className="w-5 h-5 fill-zinc-950" />
+            <Play className="w-4 h-4 fill-zinc-950" />
             <span>Iniciar Entrenamiento en Vivo</span>
           </button>
         </div>

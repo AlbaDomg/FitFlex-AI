@@ -27,7 +27,11 @@ export function OnboardingModal({ isOpen, onClose, onSave, initialProfile }) {
   };
 
   const handleFinish = () => {
-    onSave(formData);
+    onSave({
+      ...formData,
+      age: parseInt(formData.age) || 25,
+      weight: parseFloat(formData.weight) || 70
+    });
     onClose();
   };
 
@@ -100,8 +104,8 @@ export function OnboardingModal({ isOpen, onClose, onSave, initialProfile }) {
                 <input
                   type="number"
                   value={formData.age}
-                  onChange={e => setFormData({ ...formData, age: parseInt(e.target.value) || 20 })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500"
+                  onChange={e => setFormData({ ...formData, age: e.target.value })}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
               <div>
@@ -112,8 +116,8 @@ export function OnboardingModal({ isOpen, onClose, onSave, initialProfile }) {
                   type="number"
                   step="0.5"
                   value={formData.weight}
-                  onChange={e => setFormData({ ...formData, weight: parseFloat(e.target.value) || 70 })}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500"
+                  onChange={e => setFormData({ ...formData, weight: e.target.value })}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
               </div>
             </div>

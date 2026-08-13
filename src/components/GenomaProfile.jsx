@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, User, Dumbbell, Clock, ShieldAlert, Calendar, CheckCircle, Play, X, HeartPulse } from 'lucide-react';
+import { User, Dumbbell, Clock, ShieldAlert, Calendar, CheckCircle, Play, X, HeartPulse, Target, Flame, BicepsFlexed } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getMuscleSpanishName } from '../data/exerciseDatabase';
 
@@ -34,7 +34,7 @@ export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = 
           </div>
 
           <div className="flex-shrink-0 flex items-center space-x-2.5 px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-zinc-900/80 border border-emerald-500/30 dark:border-zinc-800 shadow-sm backdrop-blur-md">
-            <Sparkles className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+            <Dumbbell className="w-4 h-4 text-emerald-500 flex-shrink-0" />
             <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
               Enfoque: <span className="text-emerald-600 dark:text-emerald-400">{goal}</span>
             </span>

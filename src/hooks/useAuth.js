@@ -12,8 +12,12 @@ export function useAuth() {
     try {
       const saved = localStorage.getItem(STORAGE_AUTHORIZED_EMAILS_KEY);
       if (saved) {
-        const parsed = JSON.parse(saved);
-        // Ensure albadege94@gmail.com is always present as master admin
+        // Clean out old dummy test emails
+        const parsed = JSON.parse(saved).filter(
+          item => item.email.toLowerCase() !== 'admin@fitflex.ai' && item.email.toLowerCase() !== 'pareja@fitflex.ai'
+        );
+
+        // Ensure albadege94@gmail.com is present as master admin
         if (!parsed.some(item => item.email.toLowerCase() === 'albadege94@gmail.com')) {
           parsed.unshift({ email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' });
         }
@@ -77,27 +81,6 @@ export function useAuth() {
       return { success: true, user: adminData };
     }
 
-    // If no authorized users exist yet, the very first user becomes Master Admin!
-    if (authorizedList.length === 0) {
-      const adminItem = {
-        email: cleanEmail,
-        username: cleanUsername,
-        role: 'admin',
-        addedAt: new Date().toISOString().split('T')[0]
-      };
-
-      setAuthorizedList([adminItem]);
-
-      const userData = {
-        email: cleanEmail,
-        username: cleanUsername,
-        role: 'admin'
-      };
-
-      setCurrentUser(userData);
-      return { success: true, user: userData, isNewAdmin: true };
-    }
-
     // Check if email is in authorized list
     const foundAuth = authorizedList.find(item => item.email.toLowerCase() === cleanEmail);
 
@@ -127,7 +110,6 @@ export function useAuth() {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail) return false;
 
-    // Check if already exists
     if (authorizedList.some(item => item.email.toLowerCase() === cleanEmail)) {
       return false;
     }
@@ -149,7 +131,6 @@ export function useAuth() {
 
     setAuthorizedList(prev => prev.filter(item => item.email.toLowerCase() !== cleanEmail));
 
-    // If currently logged in user is removed, log them out immediately
     if (currentUser && currentUser.email.toLowerCase() === cleanEmail) {
       logout();
     }

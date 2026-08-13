@@ -151,10 +151,10 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
   };
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-4 space-y-5">
+    <div className="max-w-2xl mx-auto px-3 sm:px-4 py-4 space-y-5">
       
       {/* Top Media Player Status Bar */}
-      <div className="flex items-center justify-between p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 backdrop-blur-md shadow-lg">
+      <div className="flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-zinc-900/90 border border-zinc-800 backdrop-blur-md shadow-lg">
         <div className="flex items-center space-x-3">
           <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
           <div>
@@ -168,21 +168,22 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
         </div>
 
         {/* AI Background Sync Badge */}
-        <div className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-full text-xs font-bold transition-all ${
+        <div className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold transition-all ${
           isSyncing
             ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse'
             : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
         }`}>
           <Sparkles className={`w-3.5 h-3.5 ${isSyncing ? 'text-emerald-400 animate-spin' : 'text-zinc-400'}`} />
-          <span>{isSyncing ? 'IA Syncing Sincronizado...' : 'IA Sync Activo'}</span>
+          <span className="hidden sm:inline">{isSyncing ? 'IA Syncing Sincronizado...' : 'IA Sync Activo'}</span>
+          <span className="sm:hidden">{isSyncing ? 'Syncing...' : 'Sync IA'}</span>
         </div>
       </div>
 
       {/* QUICK EXERCISE TRACK BAR (Directly tap any exercise to switch) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider text-zinc-400 px-1">
-          <span>Lista de Ejercicios en Sesión ({exercises.length})</span>
-          <span>Toca para cambiar ejercicio</span>
+          <span>Ejercicios ({exercises.length})</span>
+          <span>Toca para cambiar</span>
         </div>
 
         <div className="flex items-center space-x-2 overflow-x-auto pb-1 no-scrollbar">
@@ -196,7 +197,7 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
               <button
                 key={ex.id}
                 onClick={() => selectExerciseByLinearIndex(idx)}
-                className={`flex items-center space-x-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
+                className={`flex items-center space-x-2 px-3 py-1.5 sm:px-3.5 sm:py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all border ${
                   isActiveEx
                     ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400 shadow-md ring-2 ring-emerald-500/30'
                     : isFinished
@@ -218,10 +219,10 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
 
       {/* Biseries Track Selector Bar (If Biseries) */}
       {isBiseries && exerciseA1 && (
-        <div className="grid grid-cols-2 gap-3 p-2 rounded-2xl bg-zinc-900 border border-zinc-800">
+        <div className="grid grid-cols-2 gap-2.5 p-2 rounded-2xl bg-zinc-900 border border-zinc-800">
           <button
             onClick={() => selectExerciseByLinearIndex(Math.floor(currentLinearIndex / 2) * 2)}
-            className={`p-3 rounded-xl border text-left transition-all ${
+            className={`p-2.5 sm:p-3 rounded-xl border text-left transition-all ${
               currentLinearIndex % 2 === 0
                 ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400 shadow-md ring-1 ring-emerald-500/20'
                 : 'border-zinc-800 bg-zinc-950 text-zinc-500 hover:border-zinc-700'
@@ -234,7 +235,7 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
           <button
             onClick={() => exerciseA2 && selectExerciseByLinearIndex(Math.floor(currentLinearIndex / 2) * 2 + 1)}
             disabled={!exerciseA2}
-            className={`p-3 rounded-xl border text-left transition-all ${
+            className={`p-2.5 sm:p-3 rounded-xl border text-left transition-all ${
               currentLinearIndex % 2 === 1
                 ? 'border-cyan-500 bg-cyan-500/10 text-cyan-400 shadow-md ring-1 ring-cyan-500/20'
                 : 'border-zinc-800 bg-zinc-950 text-zinc-500 hover:border-zinc-700'
@@ -252,49 +253,49 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
           key={`${activeExerciseObj.id}-${currentLinearIndex}`}
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          className="p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 shadow-2xl text-zinc-100 relative space-y-6"
+          className="p-4 sm:p-7 rounded-3xl bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800 shadow-2xl text-zinc-100 relative space-y-5 overflow-hidden"
         >
           {/* Exercise Header & Manual Navigation Shortcuts */}
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-3">
             <div>
               <div className="flex items-center space-x-2 mb-1">
-                <span className="px-2.5 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-xs font-bold uppercase tracking-wider border border-emerald-500/20">
+                <span className="px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-400 text-[11px] font-bold uppercase tracking-wider border border-emerald-500/20">
                   {getMuscleSpanishName(activeExerciseObj.muscleGroup)}
                 </span>
-                <span className="text-xs text-zinc-400 font-semibold">
+                <span className="text-[11px] text-zinc-400 font-semibold">
                   Ejercicio {currentLinearIndex + 1} de {exercises.length}
                 </span>
               </div>
 
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-zinc-50">
+              <h2 className="text-xl sm:text-3xl font-extrabold text-zinc-50 leading-tight">
                 {activeExerciseObj.name}
               </h2>
             </div>
 
-            <div className="flex items-center space-x-1">
+            <div className="flex items-center space-x-1 flex-shrink-0">
               <button
                 onClick={() => setShowTipsModal(true)}
-                className="p-2.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 transition-colors"
+                className="p-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 transition-colors"
                 title="Ver Técnica & Form Tips"
               >
-                <HelpCircle className="w-5 h-5 text-cyan-400" />
+                <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
               </button>
 
               <button
                 onClick={goToPrevExercise}
                 disabled={currentLinearIndex === 0}
-                className="p-2.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 disabled:opacity-30 transition-colors"
+                className="p-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 disabled:opacity-30 transition-colors"
                 title="Ejercicio Anterior"
               >
-                <SkipBack className="w-5 h-5" />
+                <SkipBack className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
 
               <button
                 onClick={goToNextExercise}
-                className="p-2.5 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 transition-colors"
+                className="p-2 rounded-xl bg-zinc-800/80 hover:bg-zinc-800 text-zinc-300 transition-colors"
                 title="Siguiente Ejercicio"
               >
-                <SkipForward className="w-5 h-5" />
+                <SkipForward className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
@@ -302,7 +303,7 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
           {/* Interactive Set Selector Pills */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs text-zinc-400 font-semibold">
-              <span>Selecciona Serie a Registrar:</span>
+              <span>Serie a Registrar:</span>
               <span className="text-emerald-400">Serie {currentSetIndex} de {targetSetsCount}</span>
             </div>
 
@@ -331,71 +332,74 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
             </div>
           </div>
 
-          {/* Direct Input Card for Weight and Reps */}
-          <div className="p-5 rounded-2xl bg-zinc-950 border border-zinc-800/90 space-y-5">
-            <div className="text-xs font-bold uppercase tracking-wider text-zinc-400 flex items-center justify-between">
-              <span>Registro de Cargas en Tiempo Real</span>
+          {/* Direct Input Card for Weight and Reps (Responsive Grid Fit) */}
+          <div className="p-3.5 sm:p-5 rounded-2xl bg-zinc-950 border border-zinc-800/90 space-y-4">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-zinc-400 flex items-center justify-between">
+              <span>Registro de Cargas</span>
               <span className="text-[10px] text-emerald-400">Autoguardado IA</span>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            {/* Steppers Grid - Responsive Stack on Mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              
               {/* Weight Stepper */}
-              <div>
-                <label className="text-xs text-zinc-400 font-semibold mb-1.5 block">Peso (kg)</label>
-                <div className="flex items-center justify-between p-1.5 rounded-xl bg-zinc-900 border border-zinc-800">
+              <div className="bg-zinc-900 p-2 sm:p-2.5 rounded-xl border border-zinc-800">
+                <label className="text-[11px] text-zinc-400 font-semibold mb-1 block">Peso (kg)</label>
+                <div className="flex items-center justify-between">
                   <button
                     onClick={() => setWeightInput(prev => Math.max(0, parseFloat((prev - 2.5).toFixed(1))))}
-                    className="p-3 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 active:scale-95 transition-all"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 active:scale-95 flex items-center justify-center transition-all"
                   >
-                    <Minus className="w-5 h-5" />
+                    <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <input
                     type="number"
                     step="0.5"
                     value={weightInput}
                     onChange={e => setWeightInput(parseFloat(e.target.value) || 0)}
-                    className="w-16 text-center font-black text-xl bg-transparent text-emerald-400 focus:outline-none"
+                    className="w-16 text-center font-black text-lg sm:text-xl bg-transparent text-emerald-400 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     onClick={() => setWeightInput(prev => parseFloat((prev + 2.5).toFixed(1)))}
-                    className="p-3 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 active:scale-95 transition-all"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 active:scale-95 flex items-center justify-center transition-all"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
               </div>
 
               {/* Reps Stepper */}
-              <div>
-                <label className="text-xs text-zinc-400 font-semibold mb-1.5 block">Repeticiones</label>
-                <div className="flex items-center justify-between p-1.5 rounded-xl bg-zinc-900 border border-zinc-800">
+              <div className="bg-zinc-900 p-2 sm:p-2.5 rounded-xl border border-zinc-800">
+                <label className="text-[11px] text-zinc-400 font-semibold mb-1 block">Repeticiones</label>
+                <div className="flex items-center justify-between">
                   <button
                     onClick={() => setRepsInput(prev => Math.max(1, prev - 1))}
-                    className="p-3 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 active:scale-95 transition-all"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 active:scale-95 flex items-center justify-center transition-all"
                   >
-                    <Minus className="w-5 h-5" />
+                    <Minus className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                   <input
                     type="number"
                     value={repsInput}
                     onChange={e => setRepsInput(parseInt(e.target.value) || 1)}
-                    className="w-16 text-center font-black text-xl bg-transparent text-cyan-400 focus:outline-none"
+                    className="w-16 text-center font-black text-lg sm:text-xl bg-transparent text-cyan-400 focus:outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                   />
                   <button
                     onClick={() => setRepsInput(prev => prev + 1)}
-                    className="p-3 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 active:scale-95 transition-all"
+                    className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg bg-zinc-800 text-zinc-200 hover:bg-zinc-700 active:scale-95 flex items-center justify-center transition-all"
                   >
-                    <Plus className="w-5 h-5" />
+                    <Plus className="w-4 h-4 sm:w-5 sm:h-5" />
                   </button>
                 </div>
               </div>
+
             </div>
 
             {/* RPE Slider */}
             <div>
               <div className="flex items-center justify-between text-xs text-zinc-400 font-semibold mb-1">
                 <span>RPE (Esfuerzo Percibido): {rpeInput}/10</span>
-                <span className="text-zinc-500 font-normal">
+                <span className="text-zinc-500 font-normal text-[11px]">
                   {rpeInput <= 6 ? 'Fácil' : rpeInput <= 8 ? 'Exigente' : 'Cerca del Fallo'}
                 </span>
               </div>
@@ -415,27 +419,27 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
           <div className="space-y-3">
             <button
               onClick={() => completeActiveSet(weightInput, repsInput, rpeInput)}
-              className="w-full py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 font-black text-base flex items-center justify-center space-x-3 shadow-xl shadow-emerald-500/25 hover:from-emerald-400 hover:to-cyan-400 active:scale-[0.98] transition-all"
+              className="w-full py-3.5 sm:py-4 rounded-2xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 font-black text-sm sm:text-base flex items-center justify-center space-x-2 shadow-xl shadow-emerald-500/25 hover:from-emerald-400 hover:to-cyan-400 active:scale-[0.98] transition-all"
             >
-              <Check className="w-6 h-6 stroke-[3]" />
+              <Check className="w-5 h-5 sm:w-6 sm:h-6 stroke-[3]" />
               <span>COMPLETAR SERIE & SYNC IA</span>
             </button>
 
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex items-center justify-between gap-2.5">
               <button
                 onClick={goToPrevExercise}
                 disabled={currentLinearIndex === 0}
-                className="w-1/2 py-2.5 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-bold text-zinc-300 flex items-center justify-center space-x-1.5 disabled:opacity-30 transition-all"
+                className="w-1/2 py-2.5 px-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-bold text-zinc-300 flex items-center justify-center space-x-1 disabled:opacity-30 transition-all"
               >
                 <ChevronLeft className="w-4 h-4" />
-                <span>Anterior Ejercicio</span>
+                <span>Anterior</span>
               </button>
 
               <button
                 onClick={goToNextExercise}
-                className="w-1/2 py-2.5 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-bold text-emerald-400 flex items-center justify-center space-x-1.5 transition-all"
+                className="w-1/2 py-2.5 px-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-bold text-emerald-400 flex items-center justify-center space-x-1 transition-all"
               >
-                <span>Siguiente Ejercicio</span>
+                <span>Siguiente</span>
                 <ChevronRight className="w-4 h-4" />
               </button>
             </div>

@@ -3,13 +3,25 @@ import { useState, useEffect } from 'react';
 const STORAGE_AUTH_USER_KEY = 'fitflex_active_user_v1';
 const STORAGE_AUTHORIZED_EMAILS_KEY = 'fitflex_authorized_list_v1';
 
+const DEFAULT_AUTHORIZED_LIST = [
+  { email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' }
+];
+
 export function useAuth() {
   const [authorizedList, setAuthorizedList] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_AUTHORIZED_EMAILS_KEY);
-      return saved ? JSON.parse(saved) : [];
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Ensure albadege94@gmail.com is always present as master admin
+        if (!parsed.some(item => item.email.toLowerCase() === 'albadege94@gmail.com')) {
+          parsed.unshift({ email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' });
+        }
+        return parsed;
+      }
+      return DEFAULT_AUTHORIZED_LIST;
     } catch {
-      return [];
+      return DEFAULT_AUTHORIZED_LIST;
     }
   });
 
@@ -48,6 +60,22 @@ export function useAuth() {
   const login = (emailInput, usernameInput) => {
     const cleanEmail = emailInput.trim().toLowerCase();
     const cleanUsername = usernameInput.trim() || cleanEmail.split('@')[0];
+
+    // Master Admin fallback override for albadege94@gmail.com
+    if (cleanEmail === 'albadege94@gmail.com') {
+      const adminData = {
+        email: cleanEmail,
+        username: cleanUsername || 'AlbaDomg',
+        role: 'admin'
+      };
+
+      if (!authorizedList.some(i => i.email.toLowerCase() === cleanEmail)) {
+        setAuthorizedList(prev => [{ email: cleanEmail, username: cleanUsername || 'AlbaDomg', role: 'admin', addedAt: '2026-08-13' }, ...prev]);
+      }
+
+      setCurrentUser(adminData);
+      return { success: true, user: adminData };
+    }
 
     // If no authorized users exist yet, the very first user becomes Master Admin!
     if (authorizedList.length === 0) {
@@ -117,6 +145,8 @@ export function useAuth() {
 
   const removeAuthorizedEmail = (emailToRemove) => {
     const cleanEmail = emailToRemove.trim().toLowerCase();
+    if (cleanEmail === 'albadege94@gmail.com') return; // Cannot remove master admin!
+
     setAuthorizedList(prev => prev.filter(item => item.email.toLowerCase() !== cleanEmail));
 
     // If currently logged in user is removed, log them out immediately

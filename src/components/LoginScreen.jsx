@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Dumbbell, Sparkles, ShieldCheck, User, Mail, ArrowRight, Lock, AlertCircle } from 'lucide-react';
+import { Dumbbell, User, Mail, ArrowRight, AlertCircle, ShieldCheck } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export function LoginScreen({ onLogin }) {
@@ -12,7 +12,7 @@ export function LoginScreen({ onLogin }) {
     setErrorMsg('');
 
     if (!emailInput) {
-      setErrorMsg('Por favor introduce tu dirección de correo electrónico.');
+      setErrorMsg('Por favor introduce tu dirección de correo electrónico real.');
       return;
     }
 
@@ -20,11 +20,6 @@ export function LoginScreen({ onLogin }) {
     if (!res.success) {
       setErrorMsg(res.message);
     }
-  };
-
-  const handleQuickDemo = (demoEmail, demoUser) => {
-    setEmailInput(demoEmail);
-    setUsernameInput(demoUser);
   };
 
   return (
@@ -49,7 +44,7 @@ export function LoginScreen({ onLogin }) {
           </h1>
 
           <p className="text-xs text-zinc-400">
-            Portal Privado de Entrenamientos Inteligentes. Introduce tu correo para ingresar a tu cuenta personal.
+            Portal Privado de Entrenamientos Inteligentes. Escribe tu correo y tu nombre para ingresar.
           </p>
         </div>
 
@@ -69,13 +64,13 @@ export function LoginScreen({ onLogin }) {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block mb-1.5">
-              Correo Electrónico Autorizado
+              Tu Correo Electrónico
             </label>
             <div className="relative">
               <Mail className="w-5 h-5 text-zinc-500 absolute left-3.5 top-3.5" />
               <input
                 type="email"
-                placeholder="tu-correo@gmail.com"
+                placeholder="tu-correo-real@gmail.com"
                 value={emailInput}
                 onChange={e => setEmailInput(e.target.value)}
                 className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl pl-11 pr-4 py-3 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 font-medium"
@@ -85,7 +80,7 @@ export function LoginScreen({ onLogin }) {
 
           <div>
             <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block mb-1.5">
-              Nombre de Usuario / Nombre Personal
+              Tu Nombre / Apodo
             </label>
             <div className="relative">
               <User className="w-5 h-5 text-zinc-500 absolute left-3.5 top-3.5" />
@@ -108,28 +103,11 @@ export function LoginScreen({ onLogin }) {
           </button>
         </form>
 
-        {/* Demo Quick Selectors */}
-        <div className="pt-4 border-t border-zinc-900 space-y-2">
-          <div className="text-[11px] text-zinc-500 font-semibold text-center uppercase tracking-wider">
-            Correos de Demostración Autorizados:
-          </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('albadomg@gmail.com', 'Alba (Admin)')}
-              className="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-semibold text-emerald-400 text-left truncate"
-            >
-              Alba (Admin)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickDemo('pareja@fitflex.ai', 'Mi Pareja')}
-              className="p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-[11px] font-semibold text-cyan-400 text-left truncate"
-            >
-              Mi Pareja
-            </button>
-          </div>
+        <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs flex items-center space-x-2.5">
+          <ShieldCheck className="w-4 h-4 flex-shrink-0 text-emerald-400" />
+          <span className="leading-snug">
+            El primer correo registrado será asignado automáticamente como <strong>Administrador Principal</strong>.
+          </span>
         </div>
 
       </motion.div>

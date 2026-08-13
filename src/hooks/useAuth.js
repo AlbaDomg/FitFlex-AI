@@ -3,20 +3,13 @@ import { useState, useEffect } from 'react';
 const STORAGE_AUTH_USER_KEY = 'fitflex_active_user_v1';
 const STORAGE_AUTHORIZED_EMAILS_KEY = 'fitflex_authorized_list_v1';
 
-// Initial default authorized users list (Admin + partner demo email)
-const DEFAULT_AUTHORIZED_LIST = [
-  { email: 'admin@fitflex.ai', username: 'Administrador Principal', role: 'admin', addedAt: '2026-08-13' },
-  { email: 'albadomg@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' },
-  { email: 'pareja@fitflex.ai', username: 'Mi Pareja', role: 'client', addedAt: '2026-08-13' }
-];
-
 export function useAuth() {
   const [authorizedList, setAuthorizedList] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_AUTHORIZED_EMAILS_KEY);
-      return saved ? JSON.parse(saved) : DEFAULT_AUTHORIZED_LIST;
+      return saved ? JSON.parse(saved) : [];
     } catch {
-      return DEFAULT_AUTHORIZED_LIST;
+      return [];
     }
   });
 
@@ -55,6 +48,27 @@ export function useAuth() {
   const login = (emailInput, usernameInput) => {
     const cleanEmail = emailInput.trim().toLowerCase();
     const cleanUsername = usernameInput.trim() || cleanEmail.split('@')[0];
+
+    // If no authorized users exist yet, the very first user becomes Master Admin!
+    if (authorizedList.length === 0) {
+      const adminItem = {
+        email: cleanEmail,
+        username: cleanUsername,
+        role: 'admin',
+        addedAt: new Date().toISOString().split('T')[0]
+      };
+
+      setAuthorizedList([adminItem]);
+
+      const userData = {
+        email: cleanEmail,
+        username: cleanUsername,
+        role: 'admin'
+      };
+
+      setCurrentUser(userData);
+      return { success: true, user: userData, isNewAdmin: true };
+    }
 
     // Check if email is in authorized list
     const foundAuth = authorizedList.find(item => item.email.toLowerCase() === cleanEmail);

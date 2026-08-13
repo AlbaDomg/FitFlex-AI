@@ -13,14 +13,13 @@ function playTimerSound(type = 'beep') {
     gain.connect(ctx.destination);
 
     if (type === 'beep') {
-      osc.frequency.setValueAtTime(880, ctx.currentTime); // A5 note
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
       gain.gain.setValueAtTime(0.3, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
       osc.start();
       osc.stop(ctx.currentTime + 0.2);
     } else if (type === 'finish') {
-      // High pitch double chime for rest finish
-      osc.frequency.setValueAtTime(1046.5, ctx.currentTime); // C6
+      osc.frequency.setValueAtTime(1046.5, ctx.currentTime);
       gain.gain.setValueAtTime(0.4, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
       osc.start();
@@ -34,13 +33,14 @@ function playTimerSound(type = 'beep') {
 export function useWorkoutSession(addSetLogFn) {
   const [session, setSession] = useState({
     isActive: false,
-    vibe: 'Media', // 'Baja' | 'Media' | 'Alta'
-    methodology: 'biseries', // 'biseries' | 'classic' | 'circuit' | 'dropset'
+    vibe: 'Media',
+    sessionDuration: 45,
+    methodology: 'biseries',
     exercises: [],
     currentExerciseIndex: 0,
     currentSetIndex: 1,
-    biseriesSubIndex: 0, // 0 = A1, 1 = A2
-    completedSets: {}, // { exerciseId-setNum: { weight, reps, rpe, completed: true } }
+    biseriesSubIndex: 0,
+    completedSets: {},
     startTime: null,
     restTimerSeconds: 0,
     isResting: false,
@@ -82,16 +82,32 @@ export function useWorkoutSession(addSetLogFn) {
     };
   }, [session.isResting, session.restTimerSeconds]);
 
-  // Start workout from Builder or preset
-  const startSession = (exercises, methodology = 'biseries', vibe = 'Media') => {
+  // Start workout session with dynamic sessionDuration override and energy vibe check
+  const startSession = (exercises, methodology = 'biseries', vibe = 'Media', sessionDuration = 45) => {
     let adjustedExercises = [...exercises];
-    if (vibe === 'Baja') {
+    const numericDuration = parseInt(sessionDuration) || 45;
+
+    // 1. Dynamically trim or expand sets based on session duration override
+    if (numericDuration <= 30) {
       adjustedExercises = exercises.map(ex => ({
+        ...ex,
+        defaultSets: 2
+      }));
+    } else if (numericDuration >= 90) {
+      adjustedExercises = exercises.map(ex => ({
+        ...ex,
+        defaultSets: Math.min(5, (ex.defaultSets || 3) + 1)
+      }));
+    }
+
+    // 2. Adjust sets based on Energy Vibe
+    if (vibe === 'Baja') {
+      adjustedExercises = adjustedExercises.map(ex => ({
         ...ex,
         defaultSets: Math.max(2, (ex.defaultSets || 3) - 1)
       }));
     } else if (vibe === 'Alta') {
-      adjustedExercises = exercises.map(ex => ({
+      adjustedExercises = adjustedExercises.map(ex => ({
         ...ex,
         defaultSets: (ex.defaultSets || 3) + 1
       }));
@@ -100,6 +116,7 @@ export function useWorkoutSession(addSetLogFn) {
     setSession({
       isActive: true,
       vibe,
+      sessionDuration: numericDuration,
       methodology,
       exercises: adjustedExercises,
       currentExerciseIndex: 0,
@@ -114,7 +131,6 @@ export function useWorkoutSession(addSetLogFn) {
     });
   };
 
-  // Helper to get active exercise object taking biseriesSubIndex into account
   const getActiveExercise = () => {
     if (session.exercises.length === 0) return null;
     if (session.methodology === 'biseries' && session.biseriesSubIndex === 1) {
@@ -123,7 +139,6 @@ export function useWorkoutSession(addSetLogFn) {
     return session.exercises[session.currentExerciseIndex];
   };
 
-  // Current absolute linear index in exercise list (0, 1, 2, 3...)
   const getLinearIndex = () => {
     if (session.methodology === 'biseries') {
       return session.currentExerciseIndex + session.biseriesSubIndex;
@@ -131,14 +146,12 @@ export function useWorkoutSession(addSetLogFn) {
     return session.currentExerciseIndex;
   };
 
-  // Complete an active set and trigger AI background log sync
   const completeActiveSet = (setWeight, setReps, rpe = 8) => {
     const currentEx = getActiveExercise();
     if (!currentEx) return;
 
     const setKey = `${currentEx.id}-${session.currentSetIndex}`;
 
-    // 1. Mark set as completed locally
     setSession(prev => ({
       ...prev,
       isSyncing: true,
@@ -153,7 +166,6 @@ export function useWorkoutSession(addSetLogFn) {
       }
     }));
 
-    // 2. Perform AI Background Synchronization with Load Log
     if (addSetLogFn) {
       addSetLogFn({
         exerciseId: currentEx.id,
@@ -166,12 +178,13 @@ export function useWorkoutSession(addSetLogFn) {
       });
     }
 
-    // Confirmation visual delay
     setTimeout(() => {
       setSession(prev => ({ ...prev, isSyncing: false }));
     }, 400);
 
-    // 3. Handle Rest and Next transition based on methodology
+    // Calculate rest time dynamically based on sessionDuration (shorter rest for express workouts)
+    const baseRestSec = session.sessionDuration <= 30 ? 45 : session.sessionDuration >= 90 ? 90 : 60;
+
     if (session.methodology === 'biseries' && session.exercises.length > session.currentExerciseIndex + 1) {
       if (session.biseriesSubIndex === 0) {
         setSession(prev => ({
@@ -187,7 +200,7 @@ export function useWorkoutSession(addSetLogFn) {
             ...prev,
             currentSetIndex: prev.currentSetIndex + 1,
             biseriesSubIndex: 0,
-            restTimerSeconds: 90,
+            restTimerSeconds: baseRestSec,
             isResting: true
           }));
         } else {
@@ -198,7 +211,7 @@ export function useWorkoutSession(addSetLogFn) {
               currentExerciseIndex: nextPairIndex,
               currentSetIndex: 1,
               biseriesSubIndex: 0,
-              restTimerSeconds: 90,
+              restTimerSeconds: baseRestSec,
               isResting: true
             }));
           } else {
@@ -209,7 +222,7 @@ export function useWorkoutSession(addSetLogFn) {
     } else {
       const targetSets = currentEx.defaultSets || 3;
       if (session.currentSetIndex < targetSets) {
-        const restSec = session.methodology === 'circuit' ? 30 : session.methodology === 'dropset' ? 20 : 60;
+        const restSec = session.methodology === 'circuit' ? 30 : session.methodology === 'dropset' ? 20 : baseRestSec;
         setSession(prev => ({
           ...prev,
           currentSetIndex: prev.currentSetIndex + 1,
@@ -222,7 +235,7 @@ export function useWorkoutSession(addSetLogFn) {
             ...prev,
             currentExerciseIndex: prev.currentExerciseIndex + 1,
             currentSetIndex: 1,
-            restTimerSeconds: 75,
+            restTimerSeconds: baseRestSec + 15,
             isResting: true
           }));
         } else {
@@ -232,7 +245,6 @@ export function useWorkoutSession(addSetLogFn) {
     }
   };
 
-  // Explicit Linear Navigation Controls for ALL Methodologies
   const goToNextExercise = () => {
     const currentLinear = getLinearIndex();
     const nextLinear = currentLinear + 1;
@@ -345,6 +357,7 @@ export function useWorkoutSession(addSetLogFn) {
     setSession({
       isActive: false,
       vibe: 'Media',
+      sessionDuration: 45,
       methodology: 'biseries',
       exercises: [],
       currentExerciseIndex: 0,

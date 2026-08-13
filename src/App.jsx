@@ -63,9 +63,9 @@ export function App() {
     setIsVibeCheckOpen(true);
   };
 
-  const handleConfirmVibe = (vibe) => {
+  const handleConfirmVibe = (vibe, sessionDuration) => {
     if (pendingWorkoutConfig) {
-      startSession(pendingWorkoutConfig.exercises, pendingWorkoutConfig.methodology, vibe);
+      startSession(pendingWorkoutConfig.exercises, pendingWorkoutConfig.methodology, vibe, sessionDuration);
       setIsVibeCheckOpen(false);
       setActiveTab('player');
     }
@@ -153,11 +153,12 @@ export function App() {
         initialProfile={profile}
       />
 
-      {/* Pre-Workout Vibe Check Modal */}
+      {/* Pre-Workout Vibe Check & Session Duration Override Modal */}
       <VibeCheckModal
         isOpen={isVibeCheckOpen}
         onClose={() => setIsVibeCheckOpen(false)}
         onConfirm={handleConfirmVibe}
+        defaultSessionTime={profile.sessionTime || 45}
       />
     </div>
   );

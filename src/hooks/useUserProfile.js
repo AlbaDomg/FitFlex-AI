@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getCloudData, setCloudData } from '../services/cloudSync';
 
 export function useUserProfile(userEmail = 'guest') {
   const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : 'guest';
@@ -65,60 +66,90 @@ export function useUserProfile(userEmail = 'guest') {
     }
   });
 
-  // Re-sync when userEmail changes (account switching)
+  // Cloud Sync: Fetch profile, split, streak and weight from Cloud when userEmail is active
   useEffect(() => {
-    try {
-      const savedProfile = localStorage.getItem(STORAGE_KEY);
-      setProfile(savedProfile ? JSON.parse(savedProfile) : DEFAULT_PROFILE);
+    if (!cleanEmail || cleanEmail === 'guest') return;
 
-      const savedDays = localStorage.getItem(STORAGE_COMPLETED_DAYS_KEY);
-      setCompletedSplitDays(savedDays ? JSON.parse(savedDays) : {});
+    async function syncCloudProfile() {
+      try {
+        const cloudProfile = await getCloudData(`profile_${cleanEmail}`);
+        if (cloudProfile && cloudProfile.isCompleted) {
+          setProfile(cloudProfile);
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(cloudProfile));
+        }
 
-      const savedStreak = localStorage.getItem(STREAK_KEY);
-      setStreakDays(savedStreak ? parseInt(savedStreak) : 0);
+        const cloudDays = await getCloudData(`completed_days_${cleanEmail}`);
+        if (cloudDays) {
+          setCompletedSplitDays(cloudDays);
+          localStorage.setItem(STORAGE_COMPLETED_DAYS_KEY, JSON.stringify(cloudDays));
+        }
 
-      const savedWeight = localStorage.getItem(WEIGHT_KEY);
-      setWeightHistory(savedWeight ? JSON.parse(savedWeight) : []);
-    } catch (e) {
-      console.error('Failed to sync user storage', e);
+        const cloudStreak = await getCloudData(`streak_${cleanEmail}`);
+        if (cloudStreak !== null && cloudStreak !== undefined) {
+          setStreakDays(parseInt(cloudStreak));
+          localStorage.setItem(STREAK_KEY, cloudStreak.toString());
+        }
+
+        const cloudWeight = await getCloudData(`weight_${cleanEmail}`);
+        if (cloudWeight && Array.isArray(cloudWeight)) {
+          setWeightHistory(cloudWeight);
+          localStorage.setItem(WEIGHT_KEY, JSON.stringify(cloudWeight));
+        }
+      } catch (e) {
+        console.error('Failed to sync profile from cloud', e);
+      }
     }
+
+    syncCloudProfile();
   }, [cleanEmail]);
 
-  // Save profile
+  // Save profile locally + cloud
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
+      if (cleanEmail !== 'guest') {
+        setCloudData(`profile_${cleanEmail}`, profile);
+      }
     } catch (e) {
       console.error('Failed to save profile', e);
     }
-  }, [profile, STORAGE_KEY]);
+  }, [profile, STORAGE_KEY, cleanEmail]);
 
-  // Save completed split days
+  // Save completed split days locally + cloud
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_COMPLETED_DAYS_KEY, JSON.stringify(completedSplitDays));
+      if (cleanEmail !== 'guest') {
+        setCloudData(`completed_days_${cleanEmail}`, completedSplitDays);
+      }
     } catch (e) {
       console.error('Failed to save completed days', e);
     }
-  }, [completedSplitDays, STORAGE_COMPLETED_DAYS_KEY]);
+  }, [completedSplitDays, STORAGE_COMPLETED_DAYS_KEY, cleanEmail]);
 
-  // Save streak
+  // Save streak locally + cloud
   useEffect(() => {
     try {
       localStorage.setItem(STREAK_KEY, streakDays.toString());
+      if (cleanEmail !== 'guest') {
+        setCloudData(`streak_${cleanEmail}`, streakDays);
+      }
     } catch (e) {
       console.error('Failed to save streak', e);
     }
-  }, [streakDays, STREAK_KEY]);
+  }, [streakDays, STREAK_KEY, cleanEmail]);
 
-  // Save weight history
+  // Save weight history locally + cloud
   useEffect(() => {
     try {
       localStorage.setItem(WEIGHT_KEY, JSON.stringify(weightHistory));
+      if (cleanEmail !== 'guest') {
+        setCloudData(`weight_${cleanEmail}`, weightHistory);
+      }
     } catch (e) {
       console.error('Failed to save weight history', e);
     }
-  }, [weightHistory, WEIGHT_KEY]);
+  }, [weightHistory, WEIGHT_KEY, cleanEmail]);
 
   // Sync dark class on html document element
   useEffect(() => {
@@ -167,22 +198,41 @@ export function useUserProfile(userEmail = 'guest') {
 
   const updateProfile = (newProfileData) => {
     const split = generateWeeklySplit(newProfileData.daysPerWeek, newProfileData.goal);
-    setProfile({
+    const updated = {
       ...newProfileData,
       isCompleted: true,
       split
-    });
+    };
+    setProfile(updated);
+    if (cleanEmail !== 'guest') {
+      setCloudData(`profile_${cleanEmail}`, updated);
+    }
   };
 
   const markSplitDayCompleted = (dayLabel) => {
-    setCompletedSplitDays(prev => ({ ...prev, [dayLabel]: true }));
-    setStreakDays(prev => prev + 1);
+    const updatedDays = { ...completedSplitDays, [dayLabel]: true };
+    const updatedStreak = streakDays + 1;
+    setCompletedSplitDays(updatedDays);
+    setStreakDays(updatedStreak);
+
+    if (cleanEmail !== 'guest') {
+      setCloudData(`completed_days_${cleanEmail}`, updatedDays);
+      setCloudData(`streak_${cleanEmail}`, updatedStreak);
+    }
   };
 
   const addWeightLog = (weightKg) => {
     const today = new Date().toISOString().split('T')[0];
-    setWeightHistory(prev => [...prev, { date: today, weight: parseFloat(weightKg) }]);
-    setProfile(prev => ({ ...prev, weight: parseFloat(weightKg) }));
+    const updatedWeightHist = [...weightHistory, { date: today, weight: parseFloat(weightKg) }];
+    const updatedProfile = { ...profile, weight: parseFloat(weightKg) };
+
+    setWeightHistory(updatedWeightHist);
+    setProfile(updatedProfile);
+
+    if (cleanEmail !== 'guest') {
+      setCloudData(`weight_${cleanEmail}`, updatedWeightHist);
+      setCloudData(`profile_${cleanEmail}`, updatedProfile);
+    }
   };
 
   const resetUserProfile = () => {
@@ -195,6 +245,13 @@ export function useUserProfile(userEmail = 'guest') {
     setCompletedSplitDays({});
     setStreakDays(0);
     setWeightHistory([]);
+
+    if (cleanEmail !== 'guest') {
+      setCloudData(`profile_${cleanEmail}`, DEFAULT_PROFILE);
+      setCloudData(`completed_days_${cleanEmail}`, {});
+      setCloudData(`streak_${cleanEmail}`, 0);
+      setCloudData(`weight_${cleanEmail}`, []);
+    }
   };
 
   return {

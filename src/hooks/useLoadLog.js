@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getCloudData, setCloudData } from '../services/cloudSync';
 
 const INITIAL_BADGES = [
   { id: 'b1', title: 'Genoma Inicial', desc: 'Completaste la configuración del Perfil IA', icon: 'Sparkles', unlocked: false },
@@ -32,36 +33,54 @@ export function useLoadLog(userEmail = 'guest') {
     }
   });
 
-  // Re-sync when user email changes
+  // Cloud Sync: Fetch logs and badges from Cloud storage when userEmail is active
   useEffect(() => {
-    try {
-      const savedLogs = localStorage.getItem(STORAGE_LOGS_KEY);
-      setLogs(savedLogs ? JSON.parse(savedLogs) : []);
+    if (!cleanEmail || cleanEmail === 'guest') return;
 
-      const savedBadges = localStorage.getItem(STORAGE_BADGES_KEY);
-      setBadges(savedBadges ? JSON.parse(savedBadges) : INITIAL_BADGES);
-    } catch (e) {
-      console.error('Failed to sync logs storage', e);
+    async function syncCloudLogs() {
+      try {
+        const cloudLogs = await getCloudData(`logs_${cleanEmail}`);
+        if (cloudLogs && Array.isArray(cloudLogs)) {
+          setLogs(cloudLogs);
+          localStorage.setItem(STORAGE_LOGS_KEY, JSON.stringify(cloudLogs));
+        }
+
+        const cloudBadges = await getCloudData(`badges_${cleanEmail}`);
+        if (cloudBadges && Array.isArray(cloudBadges)) {
+          setBadges(cloudBadges);
+          localStorage.setItem(STORAGE_BADGES_KEY, JSON.stringify(cloudBadges));
+        }
+      } catch (e) {
+        console.error('Failed to sync logs from cloud', e);
+      }
     }
+
+    syncCloudLogs();
   }, [cleanEmail]);
 
-  // Save logs
+  // Save logs locally + cloud
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_LOGS_KEY, JSON.stringify(logs));
+      if (cleanEmail !== 'guest') {
+        setCloudData(`logs_${cleanEmail}`, logs);
+      }
     } catch (e) {
       console.error('Failed to store logs', e);
     }
-  }, [logs, STORAGE_LOGS_KEY]);
+  }, [logs, STORAGE_LOGS_KEY, cleanEmail]);
 
-  // Save badges
+  // Save badges locally + cloud
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_BADGES_KEY, JSON.stringify(badges));
+      if (cleanEmail !== 'guest') {
+        setCloudData(`badges_${cleanEmail}`, badges);
+      }
     } catch (e) {
       console.error('Failed to store badges', e);
     }
-  }, [badges, STORAGE_BADGES_KEY]);
+  }, [badges, STORAGE_BADGES_KEY, cleanEmail]);
 
   const addSetLog = (setLogData) => {
     const { exerciseId, exerciseName, muscleGroup, weight, reps, rpe = 8, methodology } = setLogData;
@@ -88,7 +107,12 @@ export function useLoadLog(userEmail = 'guest') {
       methodology
     };
 
-    setLogs(prev => [newLog, ...prev]);
+    const updatedLogs = [newLog, ...logs];
+    setLogs(updatedLogs);
+
+    if (cleanEmail !== 'guest') {
+      setCloudData(`logs_${cleanEmail}`, updatedLogs);
+    }
 
     unlockBadge('b2');
     if (isPR) {
@@ -102,9 +126,13 @@ export function useLoadLog(userEmail = 'guest') {
   };
 
   const unlockBadge = (badgeId) => {
-    setBadges(prev =>
-      prev.map(b => (b.id === badgeId ? { ...b, unlocked: true, date: new Date().toISOString().split('T')[0] } : b))
-    );
+    setBadges(prev => {
+      const updated = prev.map(b => (b.id === badgeId ? { ...b, unlocked: true, date: new Date().toISOString().split('T')[0] } : b));
+      if (cleanEmail !== 'guest') {
+        setCloudData(`badges_${cleanEmail}`, updated);
+      }
+      return updated;
+    });
   };
 
   const getExerciseHistory = (exerciseId) => {
@@ -132,6 +160,11 @@ export function useLoadLog(userEmail = 'guest') {
     localStorage.removeItem(STORAGE_BADGES_KEY);
     setLogs([]);
     setBadges(INITIAL_BADGES);
+
+    if (cleanEmail !== 'guest') {
+      setCloudData(`logs_${cleanEmail}`, []);
+      setCloudData(`badges_${cleanEmail}`, INITIAL_BADGES);
+    }
   };
 
   return {

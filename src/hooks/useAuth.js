@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getCloudData, setCloudData } from '../services/cloudSync';
 
 const STORAGE_AUTH_USER_KEY = 'fitflex_active_user_v1';
 const STORAGE_AUTHORIZED_EMAILS_KEY = 'fitflex_authorized_list_v1';
@@ -36,10 +37,26 @@ export function useAuth() {
     }
   });
 
+  // Cloud Sync Effect for Authorized Emails List
+  useEffect(() => {
+    async function syncCloudAuthList() {
+      const remoteList = await getCloudData('authorized_users_list');
+      if (remoteList && Array.isArray(remoteList) && remoteList.length > 0) {
+        if (!remoteList.some(item => item.email.toLowerCase() === 'albadege94@gmail.com')) {
+          remoteList.unshift({ email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' });
+        }
+        setAuthorizedList(remoteList);
+        localStorage.setItem(STORAGE_AUTHORIZED_EMAILS_KEY, JSON.stringify(remoteList));
+      }
+    }
+    syncCloudAuthList();
+  }, []);
+
   // Save authorized list
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_AUTHORIZED_EMAILS_KEY, JSON.stringify(authorizedList));
+      setCloudData('authorized_users_list', authorizedList);
     } catch (e) {
       console.error('Failed to save authorized list', e);
     }
@@ -50,6 +67,7 @@ export function useAuth() {
     try {
       if (currentUser) {
         localStorage.setItem(STORAGE_AUTH_USER_KEY, JSON.stringify(currentUser));
+        setCloudData(`user_session_${currentUser.email}`, currentUser);
       } else {
         localStorage.removeItem(STORAGE_AUTH_USER_KEY);
       }
@@ -59,10 +77,11 @@ export function useAuth() {
   }, [currentUser]);
 
   // Login Handler
-  const login = (emailInput, usernameInput) => {
+  const login = async (emailInput, usernameInput) => {
     const cleanEmail = emailInput.trim().toLowerCase();
     const cleanUsername = usernameInput.trim() || cleanEmail.split('@')[0];
 
+    // Master Admin fallback override for albadege94@gmail.com
     if (cleanEmail === 'albadege94@gmail.com') {
       const adminData = {
         email: cleanEmail,
@@ -71,14 +90,21 @@ export function useAuth() {
       };
 
       if (!authorizedList.some(i => i.email.toLowerCase() === cleanEmail)) {
-        setAuthorizedList(prev => [{ email: cleanEmail, username: cleanUsername || 'AlbaDomg', role: 'admin', addedAt: '2026-08-13' }, ...prev]);
+        const newList = [{ email: cleanEmail, username: cleanUsername || 'AlbaDomg', role: 'admin', addedAt: '2026-08-13' }, ...authorizedList];
+        setAuthorizedList(newList);
+        setCloudData('authorized_users_list', newList);
       }
 
       setCurrentUser(adminData);
+      setCloudData(`user_session_${cleanEmail}`, adminData);
       return { success: true, user: adminData };
     }
 
-    const foundAuth = authorizedList.find(item => item.email.toLowerCase() === cleanEmail);
+    // Check Cloud if authorized list has been updated remotely
+    const remoteList = await getCloudData('authorized_users_list');
+    const activeList = remoteList && Array.isArray(remoteList) ? remoteList : authorizedList;
+
+    const foundAuth = activeList.find(item => item.email.toLowerCase() === cleanEmail);
 
     if (!foundAuth) {
       return {
@@ -94,6 +120,7 @@ export function useAuth() {
     };
 
     setCurrentUser(userData);
+    setCloudData(`user_session_${cleanEmail}`, userData);
     return { success: true, user: userData };
   };
 
@@ -105,9 +132,10 @@ export function useAuth() {
     if (!currentUser) return;
     const updated = { ...currentUser, username: newUsername };
     setCurrentUser(updated);
-    setAuthorizedList(prev =>
-      prev.map(i => (i.email.toLowerCase() === currentUser.email.toLowerCase() ? { ...i, username: newUsername } : i))
-    );
+    const updatedList = authorizedList.map(i => (i.email.toLowerCase() === currentUser.email.toLowerCase() ? { ...i, username: newUsername } : i));
+    setAuthorizedList(updatedList);
+    setCloudData('authorized_users_list', updatedList);
+    setCloudData(`user_session_${currentUser.email}`, updated);
   };
 
   const addAuthorizedEmail = (email, username = '', role = 'client') => {
@@ -125,7 +153,9 @@ export function useAuth() {
       addedAt: new Date().toISOString().split('T')[0]
     };
 
-    setAuthorizedList(prev => [...prev, newAuthItem]);
+    const updatedList = [...authorizedList, newAuthItem];
+    setAuthorizedList(updatedList);
+    setCloudData('authorized_users_list', updatedList);
     return true;
   };
 
@@ -133,7 +163,9 @@ export function useAuth() {
     const cleanEmail = emailToRemove.trim().toLowerCase();
     if (cleanEmail === 'albadege94@gmail.com') return;
 
-    setAuthorizedList(prev => prev.filter(item => item.email.toLowerCase() !== cleanEmail));
+    const updatedList = authorizedList.filter(item => item.email.toLowerCase() !== cleanEmail);
+    setAuthorizedList(updatedList);
+    setCloudData('authorized_users_list', updatedList);
 
     if (currentUser && currentUser.email.toLowerCase() === cleanEmail) {
       logout();

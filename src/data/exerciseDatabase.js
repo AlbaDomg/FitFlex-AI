@@ -148,9 +148,15 @@ export function calculatePersonalizedLoad(
   else if (exercise.muscleGroup === 'triceps') {
     baseRatio = isFemale ? 0.25 : 0.4;
   }
-  // Lower Body (Sentadillas, Peso Muerto, Hip Thrust)
+  // Lower Body (Sentadillas, Peso Muerto, Hip Thrust, Prensa, Máquinas Guiadas)
   else if (exercise.muscleGroup === 'quads' || exercise.muscleGroup === 'hamstrings') {
-    baseRatio = isFemale ? 0.7 : 0.9;
+    if (exercise.id === 'ex-quads-4' || exercise.id === 'ex-hams-6') {
+      baseRatio = isFemale ? 1.2 : 1.6; // Leg press allows higher relative loads
+    } else if (exercise.id === 'ex-quads-5' || exercise.id === 'ex-hams-4' || exercise.id === 'ex-hams-5') {
+      baseRatio = isFemale ? 0.45 : 0.6; // Isolation machines
+    } else {
+      baseRatio = isFemale ? 0.7 : 0.9;
+    }
   }
 
   // Equipment correction (Dumbbells are per hand, so ratio is halved)
@@ -462,6 +468,34 @@ export const EXERCISE_DATABASE = [
     tips: 'Rango de movimiento completo bajando cadera por debajo del paralelo de rodillas.',
     biseriesPairId: 'ex-hams-3'
   },
+  {
+    id: 'ex-quads-4',
+    name: 'Prensa de Piernas Inclinada 45°',
+    muscleGroup: 'quads',
+    secondaryMuscles: ['glutes', 'hamstrings'],
+    equipment: 'gym',
+    difficulty: 'Principiante',
+    movementType: 'Leg',
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultWeightKg: 100,
+    tips: 'Apoya toda la espalda en el respaldo, coloca los pies a la anchura de caderas y baja la plataforma con control sin despegar la pelvis.',
+    biseriesPairId: 'ex-hams-4'
+  },
+  {
+    id: 'ex-quads-5',
+    name: 'Extensión de Cuádriceps en Máquina',
+    muscleGroup: 'quads',
+    secondaryMuscles: [],
+    equipment: 'gym',
+    difficulty: 'Principiante',
+    movementType: 'Leg',
+    defaultSets: 3,
+    defaultReps: '12-15',
+    defaultWeightKg: 40,
+    tips: 'Ajusta el rodillo justo por encima de los tobillos. Extiende las rodillas completamente aguantando 1 segundo la contracción arriba.',
+    biseriesPairId: 'ex-hams-5'
+  },
 
   // HAMSTRINGS
   {
@@ -505,6 +539,48 @@ export const EXERCISE_DATABASE = [
     defaultWeightKg: 0,
     tips: 'En el suelo, eleva una pierna estirada y empuja la cadera con el talón apoyado.',
     biseriesPairId: 'ex-quads-3'
+  },
+  {
+    id: 'ex-hams-4',
+    name: 'Curl Femoral Tumbado en Máquina',
+    muscleGroup: 'hamstrings',
+    secondaryMuscles: ['glutes'],
+    equipment: 'gym',
+    difficulty: 'Principiante',
+    movementType: 'Leg',
+    defaultSets: 4,
+    defaultReps: '10-12',
+    defaultWeightKg: 35,
+    tips: 'Flexiona las rodillas llevando el rodillo hacia los glúteos de forma fluida sin levantar la cadera del banco.',
+    biseriesPairId: 'ex-quads-4'
+  },
+  {
+    id: 'ex-hams-5',
+    name: 'Máquina de Aductores / Abductores de Cadera',
+    muscleGroup: 'hamstrings',
+    secondaryMuscles: ['glutes', 'quads'],
+    equipment: 'gym',
+    difficulty: 'Principiante',
+    movementType: 'Leg',
+    defaultSets: 3,
+    defaultReps: '12-15',
+    defaultWeightKg: 30,
+    tips: 'Espalda bien pegada al respaldo, realiza aperturas/cierres controlados enfocando el trabajo en glúteos e ingle.',
+    biseriesPairId: 'ex-quads-5'
+  },
+  {
+    id: 'ex-hams-6',
+    name: 'Elevación de Gemelos en Prensa / Máquina',
+    muscleGroup: 'hamstrings',
+    secondaryMuscles: ['quads'],
+    equipment: 'gym',
+    difficulty: 'Principiante',
+    movementType: 'Leg',
+    defaultSets: 3,
+    defaultReps: '15-20',
+    defaultWeightKg: 50,
+    tips: 'Apoya solo los metatarsos en el borde de la plataforma. Desciende profundamente para estirar y eleva los talones al máximo.',
+    biseriesPairId: null
   },
 
   // ABS / CORE

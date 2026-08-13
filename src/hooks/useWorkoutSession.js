@@ -30,8 +30,11 @@ function playTimerSound(type = 'beep') {
   }
 }
 
-export function useWorkoutSession(addSetLogFn) {
-  const [session, setSession] = useState({
+export function useWorkoutSession(addSetLogFn, userEmail = 'guest') {
+  const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : 'guest';
+  const SESSION_STORAGE_KEY = `fitflex_live_session_${cleanEmail}`;
+
+  const DEFAULT_SESSION = {
     isActive: false,
     vibe: 'Media',
     sessionDuration: 45,
@@ -46,9 +49,55 @@ export function useWorkoutSession(addSetLogFn) {
     isResting: false,
     isSyncing: false,
     isCompleted: false
+  };
+
+  const [session, setSession] = useState(() => {
+    try {
+      const saved = localStorage.getItem(SESSION_STORAGE_KEY);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed && parsed.isActive) {
+          return {
+            ...parsed,
+            isResting: false,
+            restTimerSeconds: 0
+          };
+        }
+      }
+      return DEFAULT_SESSION;
+    } catch {
+      return DEFAULT_SESSION;
+    }
   });
 
   const timerRef = useRef(null);
+
+  // Persist session to localStorage
+  useEffect(() => {
+    try {
+      if (session.isActive && !session.isCompleted) {
+        localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session));
+      } else {
+        localStorage.removeItem(SESSION_STORAGE_KEY);
+      }
+    } catch (e) {
+      console.error('Failed to save live session to localStorage', e);
+    }
+  }, [session, SESSION_STORAGE_KEY]);
+
+  // Prevent accidental page unload / refresh during an active workout
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (session.isActive && !session.isCompleted) {
+        e.preventDefault();
+        e.returnValue = 'Tienes un entrenamiento en curso. ¿Seguro que deseas salir?';
+        return e.returnValue;
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [session.isActive, session.isCompleted]);
 
   // Countdown timer effect
   useEffect(() => {

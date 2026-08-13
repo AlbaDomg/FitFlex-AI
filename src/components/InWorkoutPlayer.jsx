@@ -57,6 +57,7 @@ export function InWorkoutPlayer({ sessionHooks, profile, onFinishWorkout, onGoTo
   const [repsInput, setRepsInput] = useState(initialSmartLoad?.defaultRepsNum || 10);
   const [rpeInput, setRpeInput] = useState(8);
   const [showTipsModal, setShowTipsModal] = useState(false);
+  const [showExitConfirmModal, setShowExitConfirmModal] = useState(false);
 
   // Sync inputs when active exercise changes
   React.useEffect(() => {
@@ -184,15 +185,26 @@ export function InWorkoutPlayer({ sessionHooks, profile, onFinishWorkout, onGoTo
           </div>
         </div>
 
-        {/* AI Background Sync Badge */}
-        <div className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold transition-all ${
-          isSyncing
-            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse'
-            : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
-        }`}>
-          <Sparkles className={`w-3.5 h-3.5 ${isSyncing ? 'text-emerald-400 animate-spin' : 'text-zinc-400'}`} />
-          <span className="hidden sm:inline">{isSyncing ? 'IA Syncing Sincronizado...' : 'IA Sync Activo'}</span>
-          <span className="sm:hidden">{isSyncing ? 'Syncing...' : 'Sync IA'}</span>
+        {/* AI Background Sync Badge & Salir Button */}
+        <div className="flex items-center space-x-2">
+          <div className={`flex items-center space-x-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs font-bold transition-all ${
+            isSyncing
+              ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse'
+              : 'bg-zinc-800 text-zinc-400 border border-zinc-700'
+          }`}>
+            <Sparkles className={`w-3.5 h-3.5 ${isSyncing ? 'text-emerald-400 animate-spin' : 'text-zinc-400'}`} />
+            <span className="hidden sm:inline">{isSyncing ? 'IA Syncing Sincronizado...' : 'IA Sync Activo'}</span>
+            <span className="sm:hidden">{isSyncing ? 'Syncing...' : 'Sync IA'}</span>
+          </div>
+
+          <button
+            onClick={() => setShowExitConfirmModal(true)}
+            className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 text-xs font-extrabold flex items-center space-x-1 transition-all"
+            title="Salir del Entrenamiento en Vivo"
+          >
+            <X className="w-3.5 h-3.5 text-red-400" />
+            <span className="hidden sm:inline">Salir</span>
+          </button>
         </div>
       </div>
 
@@ -531,6 +543,44 @@ export function InWorkoutPlayer({ sessionHooks, profile, onFinishWorkout, onGoTo
             <p className="text-xs text-zinc-400 leading-relaxed bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
               💡 {activeExerciseObj.tips}
             </p>
+          </div>
+        </div>
+      )}
+
+      {/* Exit Confirmation Modal */}
+      {showExitConfirmModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md">
+          <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl text-zinc-100 space-y-5 text-center relative">
+            <div className="w-14 h-14 rounded-full bg-red-500/10 text-red-400 border border-red-500/20 flex items-center justify-center mx-auto">
+              <X className="w-7 h-7" />
+            </div>
+
+            <div>
+              <h3 className="text-lg font-extrabold text-zinc-50">¿Salir del Entrenamiento en Vivo?</h3>
+              <p className="text-xs text-zinc-400 mt-1.5 leading-relaxed">
+                Si sales ahora, la sesión actual se detendrá y no se registrarán más datos. ¿Seguro que deseas salir?
+              </p>
+            </div>
+
+            <div className="flex items-center space-x-3 pt-2">
+              <button
+                onClick={() => setShowExitConfirmModal(false)}
+                className="w-1/2 py-3 rounded-2xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-extrabold transition-all"
+              >
+                Continuar
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowExitConfirmModal(false);
+                  resetSession();
+                  if (onGoToBuilder) onGoToBuilder();
+                }}
+                className="w-1/2 py-3 rounded-2xl bg-red-500/20 hover:bg-red-500/30 text-red-400 border border-red-500/30 text-xs font-black transition-all"
+              >
+                Sí, Salir
+              </button>
+            </div>
           </div>
         </div>
       )}

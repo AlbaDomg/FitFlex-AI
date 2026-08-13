@@ -29,11 +29,18 @@ export function App() {
   // Core Custom State Management Hooks Scoped to Active User Email
   const profileHooks = useUserProfile(currentUser?.email);
   const loadLogHooks = useLoadLog(currentUser?.email);
-  const sessionHooks = useWorkoutSession(loadLogHooks.addSetLog);
+  const sessionHooks = useWorkoutSession(loadLogHooks.addSetLog, currentUser?.email);
 
   const { profile, updateProfile, theme, toggleTheme, streakDays, completedSplitDays, markSplitDayCompleted, resetUserProfile } = profileHooks;
   const { session, startSession, resetSession } = sessionHooks;
   const { resetLoadLog } = loadLogHooks;
+
+  // Auto-restore active workout player tab if a live session is active on reload
+  React.useEffect(() => {
+    if (session.isActive && !session.isCompleted) {
+      setActiveTab('player');
+    }
+  }, [session.isActive, session.isCompleted]);
 
   // If user is not logged in / authorized, render Login Portal Screen
   if (!currentUser) {

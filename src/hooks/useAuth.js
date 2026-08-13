@@ -12,12 +12,10 @@ export function useAuth() {
     try {
       const saved = localStorage.getItem(STORAGE_AUTHORIZED_EMAILS_KEY);
       if (saved) {
-        // Clean out old dummy test emails
         const parsed = JSON.parse(saved).filter(
           item => item.email.toLowerCase() !== 'admin@fitflex.ai' && item.email.toLowerCase() !== 'pareja@fitflex.ai'
         );
 
-        // Ensure albadege94@gmail.com is present as master admin
         if (!parsed.some(item => item.email.toLowerCase() === 'albadege94@gmail.com')) {
           parsed.unshift({ email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' });
         }
@@ -65,7 +63,6 @@ export function useAuth() {
     const cleanEmail = emailInput.trim().toLowerCase();
     const cleanUsername = usernameInput.trim() || cleanEmail.split('@')[0];
 
-    // Master Admin fallback override for albadege94@gmail.com
     if (cleanEmail === 'albadege94@gmail.com') {
       const adminData = {
         email: cleanEmail,
@@ -81,7 +78,6 @@ export function useAuth() {
       return { success: true, user: adminData };
     }
 
-    // Check if email is in authorized list
     const foundAuth = authorizedList.find(item => item.email.toLowerCase() === cleanEmail);
 
     if (!foundAuth) {
@@ -105,7 +101,15 @@ export function useAuth() {
     setCurrentUser(null);
   };
 
-  // Admin Actions
+  const updateUsername = (newUsername) => {
+    if (!currentUser) return;
+    const updated = { ...currentUser, username: newUsername };
+    setCurrentUser(updated);
+    setAuthorizedList(prev =>
+      prev.map(i => (i.email.toLowerCase() === currentUser.email.toLowerCase() ? { ...i, username: newUsername } : i))
+    );
+  };
+
   const addAuthorizedEmail = (email, username = '', role = 'client') => {
     const cleanEmail = email.trim().toLowerCase();
     if (!cleanEmail) return false;
@@ -127,7 +131,7 @@ export function useAuth() {
 
   const removeAuthorizedEmail = (emailToRemove) => {
     const cleanEmail = emailToRemove.trim().toLowerCase();
-    if (cleanEmail === 'albadege94@gmail.com') return; // Cannot remove master admin!
+    if (cleanEmail === 'albadege94@gmail.com') return;
 
     setAuthorizedList(prev => prev.filter(item => item.email.toLowerCase() !== cleanEmail));
 
@@ -141,6 +145,7 @@ export function useAuth() {
     authorizedList,
     login,
     logout,
+    updateUsername,
     addAuthorizedEmail,
     removeAuthorizedEmail,
     isAdmin: currentUser?.role === 'admin'

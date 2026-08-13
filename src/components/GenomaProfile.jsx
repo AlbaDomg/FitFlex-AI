@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Sparkles, User, Dumbbell, Clock, ShieldAlert, Calendar, ArrowRight, RefreshCw, Flame, CheckCircle, Play, X, HeartPulse, Trash2 } from 'lucide-react';
+import { Sparkles, User, Dumbbell, Clock, ShieldAlert, Calendar, CheckCircle, Play, X, HeartPulse } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { getMuscleSpanishName } from '../data/exerciseDatabase';
 
-export function GenomaProfile({ profile, onOpenOnboarding, onStartCustomBuilder, onSelectSplitDay, onResetApp, completedSplitDays = {} }) {
+export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = {} }) {
   const { gender, age, weight, goal, daysPerWeek, sessionTime, equipment, protectedZones, split = [] } = profile;
   const [selectedRestDay, setSelectedRestDay] = useState(null);
 
@@ -18,12 +18,12 @@ export function GenomaProfile({ profile, onOpenOnboarding, onStartCustomBuilder,
   return (
     <div className="space-y-8 max-w-6xl mx-auto px-4 py-6">
       
-      {/* Header Banner */}
+      {/* Clean & Sleek Header Banner */}
       <div className="relative rounded-3xl bg-gradient-to-r from-zinc-900 via-zinc-950 to-black border border-zinc-800 p-6 sm:p-8 overflow-hidden shadow-xl">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-3">
               <Sparkles className="w-3.5 h-3.5" />
@@ -32,36 +32,9 @@ export function GenomaProfile({ profile, onOpenOnboarding, onStartCustomBuilder,
             <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight">
               Perfil de Entrenamiento & División IA
             </h1>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 max-w-xl">
-              Configuración optimizada para {goal} con foco en sobrecarga progresiva y alternancia de volumen muscular.
+            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+              Plan semanal adaptativo optimizado para {goal} con sobrecarga progresiva y recuperación optimizada.
             </p>
-          </div>
-
-          <div className="flex flex-wrap gap-2.5">
-            <button
-              onClick={onResetApp}
-              className="px-3.5 py-2.5 rounded-xl border border-red-500/30 bg-red-500/10 text-red-400 text-xs font-semibold flex items-center space-x-1.5 hover:bg-red-500/20 transition-colors shadow-sm"
-              title="Borrar todos los datos de prueba y comenzar desde cero"
-            >
-              <Trash2 className="w-4 h-4 text-red-400" />
-              <span>Resetear App</span>
-            </button>
-
-            <button
-              onClick={onOpenOnboarding}
-              className="px-4 py-2.5 rounded-xl border border-zinc-300 dark:border-zinc-800 bg-white dark:bg-zinc-900 text-zinc-800 dark:text-zinc-200 text-xs font-semibold flex items-center space-x-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors shadow-sm"
-            >
-              <RefreshCw className="w-4 h-4 text-zinc-400" />
-              <span>Reconfigurar Genoma</span>
-            </button>
-
-            <button
-              onClick={onStartCustomBuilder}
-              className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 text-xs font-extrabold flex items-center space-x-2 hover:from-emerald-400 hover:to-cyan-400 transition-all shadow-lg shadow-emerald-500/20"
-            >
-              <span>Creador Personalizado</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>

@@ -8,6 +8,7 @@ import { EvolutionAnalytics } from './components/EvolutionAnalytics';
 import { VibeCheckModal } from './components/VibeCheckModal';
 import { LoginScreen } from './components/LoginScreen';
 import { AdminPanel } from './components/AdminPanel';
+import { SettingsModal } from './components/SettingsModal';
 
 import { useAuth } from './hooks/useAuth';
 import { useUserProfile } from './hooks/useUserProfile';
@@ -17,11 +18,12 @@ import { getRecommendedExercises } from './data/exerciseDatabase';
 
 export function App() {
   const authHooks = useAuth();
-  const { currentUser, isAdmin, login, logout, authorizedList, addAuthorizedEmail, removeAuthorizedEmail } = authHooks;
+  const { currentUser, isAdmin, login, logout, updateUsername, authorizedList, addAuthorizedEmail, removeAuthorizedEmail } = authHooks;
 
   const [activeTab, setActiveTab] = useState('genoma');
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isVibeCheckOpen, setIsVibeCheckOpen] = useState(false);
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [pendingWorkoutConfig, setPendingWorkoutConfig] = useState(null);
 
   // Core Custom State Management Hooks Scoped to Active User Email
@@ -99,6 +101,7 @@ export function App() {
         currentUser={currentUser}
         isAdmin={isAdmin}
         onLogout={logout}
+        onOpenSettings={() => setIsSettingsOpen(true)}
       />
 
       {/* Main Content Router View */}
@@ -106,11 +109,8 @@ export function App() {
         {activeTab === 'genoma' && (
           <GenomaProfile
             profile={profile}
-            onOpenOnboarding={() => setIsOnboardingOpen(true)}
-            onStartCustomBuilder={() => setActiveTab('builder')}
             onSelectSplitDay={handleSelectSplitDay}
             completedSplitDays={completedSplitDays}
-            onResetApp={handleResetApp}
           />
         )}
 
@@ -159,6 +159,17 @@ export function App() {
         onClose={() => setIsVibeCheckOpen(false)}
         onConfirm={handleConfirmVibe}
         defaultSessionTime={profile.sessionTime || 45}
+      />
+
+      {/* Settings Modal */}
+      <SettingsModal
+        isOpen={isSettingsOpen}
+        onClose={() => setIsSettingsOpen(false)}
+        currentUser={currentUser}
+        onUpdateUsername={updateUsername}
+        onOpenOnboarding={() => setIsOnboardingOpen(true)}
+        onResetApp={handleResetApp}
+        onLogout={logout}
       />
     </div>
   );

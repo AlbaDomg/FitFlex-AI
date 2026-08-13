@@ -1,7 +1,7 @@
 import React from 'react';
-import { Dumbbell, Sparkles, Flame, Moon, Sun, Activity, Trophy, ShieldCheck, LogOut, User } from 'lucide-react';
+import { Dumbbell, Sparkles, Flame, Moon, Sun, Activity, Trophy, ShieldCheck, LogOut, User, Settings } from 'lucide-react';
 
-export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays, isSessionActive, currentUser, isAdmin, onLogout }) {
+export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays, isSessionActive, currentUser, isAdmin, onLogout, onOpenSettings }) {
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-zinc-200 dark:border-zinc-800 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -26,10 +26,10 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
           </div>
 
           {/* Navigation Links (Desktop & Tablet) */}
-          <nav className="hidden md:flex items-center space-x-1">
+          <nav className="hidden md:flex items-center space-x-2">
             <button
               onClick={() => setActiveTab('genoma')}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
                 activeTab === 'genoma'
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -38,20 +38,22 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
               Genoma IA
             </button>
 
+            {/* Highlighted Creador IA Button */}
             <button
               onClick={() => setActiveTab('builder')}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-xl text-sm font-extrabold flex items-center space-x-1.5 transition-all shadow-md ${
                 activeTab === 'builder'
-                  ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold'
-                  : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-zinc-950 shadow-emerald-500/30'
+                  : 'bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 text-emerald-400 border border-emerald-500/30 hover:from-emerald-500 hover:to-cyan-500 hover:text-zinc-950'
               }`}
             >
-              Creador IA
+              <Dumbbell className="w-4 h-4" />
+              <span>Creador IA</span>
             </button>
 
             <button
               onClick={() => setActiveTab('player')}
-              className={`relative px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`relative px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
                 activeTab === 'player'
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -68,7 +70,7 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
 
             <button
               onClick={() => setActiveTab('evolution')}
-              className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+              className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
                 activeTab === 'evolution'
                   ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-semibold'
                   : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
@@ -80,9 +82,9 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
             {isAdmin && (
               <button
                 onClick={() => setActiveTab('admin')}
-                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`px-3.5 py-2 rounded-xl text-sm font-medium transition-all ${
                   activeTab === 'admin'
-                    ? 'bg-cyan-500/10 text-cyan-500 font-semibold'
+                    ? 'bg-cyan-500/10 text-cyan-400 font-semibold border border-cyan-500/20'
                     : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
                 }`}
               >
@@ -92,10 +94,10 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
           </nav>
 
           {/* Right Status Badges & Controls */}
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2 sm:space-x-3">
             {/* User Chip */}
             {currentUser && (
-              <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">
+              <div className="hidden lg:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">
                 <User className="w-3.5 h-3.5 text-emerald-500" />
                 <span className="text-zinc-800 dark:text-zinc-200 max-w-[120px] truncate">
                   {currentUser.username}
@@ -118,13 +120,13 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
               {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-zinc-700" />}
             </button>
 
-            {/* Logout Button */}
+            {/* Settings Gear Modal Trigger Button */}
             <button
-              onClick={onLogout}
-              className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
-              title="Cerrar Sesión"
+              onClick={onOpenSettings}
+              className="p-2 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+              title="Configuración de Cuenta & Genoma"
             >
-              <LogOut className="w-5 h-5" />
+              <Settings className="w-5 h-5 text-emerald-400" />
             </button>
           </div>
 

@@ -18,23 +18,26 @@ export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = 
   return (
     <div className="space-y-8 max-w-6xl mx-auto px-4 py-6">
       
-      {/* Clean & Sleek Header Banner with Light Mode Adaptation */}
-      <div className="relative rounded-3xl bg-gradient-to-r from-emerald-50 via-slate-50 to-cyan-50 border border-emerald-500/20 dark:bg-gradient-to-r dark:from-zinc-900 dark:via-zinc-950 dark:to-black dark:border-zinc-800 p-6 sm:p-8 overflow-hidden shadow-lg transition-colors">
+      {/* Clean & Balanced Header Banner */}
+      <div className="relative rounded-3xl bg-gradient-to-r from-emerald-50 via-slate-50 to-cyan-50 border border-emerald-500/20 dark:bg-gradient-to-r dark:from-zinc-900 dark:via-zinc-950 dark:to-black dark:border-zinc-800 p-6 sm:p-7 overflow-hidden shadow-lg transition-colors">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-400 text-xs font-bold mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Genoma Activo: Algoritmo v2.4</span>
-            </div>
+          <div className="max-w-2xl">
             <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight">
               Perfil de Entrenamiento & División IA
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed font-medium">
-              Plan semanal adaptativo optimizado para {goal} con sobrecarga progresiva y recuperación optimizada.
+            <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-400 mt-1.5 leading-relaxed font-medium">
+              Plan semanal adaptativo estructurado con sobrecarga progresiva y períodos de recuperación muscular.
             </p>
+          </div>
+
+          <div className="flex-shrink-0 flex items-center space-x-2.5 px-4 py-2.5 rounded-2xl bg-white/80 dark:bg-zinc-900/80 border border-emerald-500/30 dark:border-zinc-800 shadow-sm backdrop-blur-md">
+            <Sparkles className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+            <span className="text-xs font-bold text-zinc-800 dark:text-zinc-200">
+              Enfoque: <span className="text-emerald-600 dark:text-emerald-400">{goal}</span>
+            </span>
           </div>
         </div>
       </div>

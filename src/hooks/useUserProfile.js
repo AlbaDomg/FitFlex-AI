@@ -1,23 +1,26 @@
 import { useState, useEffect } from 'react';
 
-const STORAGE_KEY = 'fitflex_user_profile_v1';
-const THEME_KEY = 'fitflex_theme_v1';
-const STORAGE_COMPLETED_DAYS_KEY = 'fitflex_completed_split_days_v1';
+export function useUserProfile(userEmail = 'guest') {
+  const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : 'guest';
+  const STORAGE_KEY = `fitflex_profile_${cleanEmail}`;
+  const THEME_KEY = 'fitflex_theme_v1';
+  const STORAGE_COMPLETED_DAYS_KEY = `fitflex_completed_days_${cleanEmail}`;
+  const STREAK_KEY = `fitflex_streak_${cleanEmail}`;
+  const WEIGHT_KEY = `fitflex_weight_${cleanEmail}`;
 
-const DEFAULT_PROFILE = {
-  gender: 'Hombre',
-  age: 26,
-  weight: 70,
-  goal: 'Hipertrofia / Agrandar Músculo',
-  daysPerWeek: 4,
-  sessionTime: 45,
-  equipment: 'gym',
-  protectedZones: [],
-  isCompleted: false,
-  split: []
-};
+  const DEFAULT_PROFILE = {
+    gender: 'Hombre',
+    age: 26,
+    weight: 70,
+    goal: 'Hipertrofia / Agrandar Músculo',
+    daysPerWeek: 4,
+    sessionTime: 45,
+    equipment: 'gym',
+    protectedZones: [],
+    isCompleted: false,
+    split: []
+  };
 
-export function useUserProfile() {
   const [profile, setProfile] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
@@ -46,7 +49,7 @@ export function useUserProfile() {
 
   const [streakDays, setStreakDays] = useState(() => {
     try {
-      const saved = localStorage.getItem('fitflex_streak_days_v1');
+      const saved = localStorage.getItem(STREAK_KEY);
       return saved ? parseInt(saved) : 0;
     } catch {
       return 0;
@@ -55,12 +58,31 @@ export function useUserProfile() {
 
   const [weightHistory, setWeightHistory] = useState(() => {
     try {
-      const saved = localStorage.getItem('fitflex_weight_history_v1');
+      const saved = localStorage.getItem(WEIGHT_KEY);
       return saved ? JSON.parse(saved) : [];
     } catch {
       return [];
     }
   });
+
+  // Re-sync when userEmail changes (account switching)
+  useEffect(() => {
+    try {
+      const savedProfile = localStorage.getItem(STORAGE_KEY);
+      setProfile(savedProfile ? JSON.parse(savedProfile) : DEFAULT_PROFILE);
+
+      const savedDays = localStorage.getItem(STORAGE_COMPLETED_DAYS_KEY);
+      setCompletedSplitDays(savedDays ? JSON.parse(savedDays) : {});
+
+      const savedStreak = localStorage.getItem(STREAK_KEY);
+      setStreakDays(savedStreak ? parseInt(savedStreak) : 0);
+
+      const savedWeight = localStorage.getItem(WEIGHT_KEY);
+      setWeightHistory(savedWeight ? JSON.parse(savedWeight) : []);
+    } catch (e) {
+      console.error('Failed to sync user storage', e);
+    }
+  }, [cleanEmail]);
 
   // Save profile
   useEffect(() => {
@@ -69,7 +91,7 @@ export function useUserProfile() {
     } catch (e) {
       console.error('Failed to save profile', e);
     }
-  }, [profile]);
+  }, [profile, STORAGE_KEY]);
 
   // Save completed split days
   useEffect(() => {
@@ -78,25 +100,25 @@ export function useUserProfile() {
     } catch (e) {
       console.error('Failed to save completed days', e);
     }
-  }, [completedSplitDays]);
+  }, [completedSplitDays, STORAGE_COMPLETED_DAYS_KEY]);
 
   // Save streak
   useEffect(() => {
     try {
-      localStorage.setItem('fitflex_streak_days_v1', streakDays.toString());
+      localStorage.setItem(STREAK_KEY, streakDays.toString());
     } catch (e) {
       console.error('Failed to save streak', e);
     }
-  }, [streakDays]);
+  }, [streakDays, STREAK_KEY]);
 
   // Save weight history
   useEffect(() => {
     try {
-      localStorage.setItem('fitflex_weight_history_v1', JSON.stringify(weightHistory));
+      localStorage.setItem(WEIGHT_KEY, JSON.stringify(weightHistory));
     } catch (e) {
       console.error('Failed to save weight history', e);
     }
-  }, [weightHistory]);
+  }, [weightHistory, WEIGHT_KEY]);
 
   // Sync dark class on html document element
   useEffect(() => {
@@ -166,8 +188,8 @@ export function useUserProfile() {
   const resetUserProfile = () => {
     localStorage.removeItem(STORAGE_KEY);
     localStorage.removeItem(STORAGE_COMPLETED_DAYS_KEY);
-    localStorage.removeItem('fitflex_streak_days_v1');
-    localStorage.removeItem('fitflex_weight_history_v1');
+    localStorage.removeItem(STREAK_KEY);
+    localStorage.removeItem(WEIGHT_KEY);
 
     setProfile(DEFAULT_PROFILE);
     setCompletedSplitDays({});

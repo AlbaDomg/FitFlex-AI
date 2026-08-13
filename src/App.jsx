@@ -6,26 +6,37 @@ import { CustomWorkoutBuilder } from './components/CustomWorkoutBuilder';
 import { InWorkoutPlayer } from './components/InWorkoutPlayer';
 import { EvolutionAnalytics } from './components/EvolutionAnalytics';
 import { VibeCheckModal } from './components/VibeCheckModal';
+import { LoginScreen } from './components/LoginScreen';
+import { AdminPanel } from './components/AdminPanel';
 
+import { useAuth } from './hooks/useAuth';
 import { useUserProfile } from './hooks/useUserProfile';
 import { useLoadLog } from './hooks/useLoadLog';
 import { useWorkoutSession } from './hooks/useWorkoutSession';
 import { getRecommendedExercises } from './data/exerciseDatabase';
 
 export function App() {
+  const authHooks = useAuth();
+  const { currentUser, isAdmin, login, logout, authorizedList, addAuthorizedEmail, removeAuthorizedEmail } = authHooks;
+
   const [activeTab, setActiveTab] = useState('genoma');
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isVibeCheckOpen, setIsVibeCheckOpen] = useState(false);
   const [pendingWorkoutConfig, setPendingWorkoutConfig] = useState(null);
 
-  // Core Custom State Management Hooks
-  const profileHooks = useUserProfile();
-  const loadLogHooks = useLoadLog();
+  // Core Custom State Management Hooks Scoped to Active User Email
+  const profileHooks = useUserProfile(currentUser?.email);
+  const loadLogHooks = useLoadLog(currentUser?.email);
   const sessionHooks = useWorkoutSession(loadLogHooks.addSetLog);
 
   const { profile, updateProfile, theme, toggleTheme, streakDays, completedSplitDays, markSplitDayCompleted, resetUserProfile } = profileHooks;
   const { session, startSession, resetSession } = sessionHooks;
   const { resetLoadLog } = loadLogHooks;
+
+  // If user is not logged in / authorized, render Login Portal Screen
+  if (!currentUser) {
+    return <LoginScreen onLogin={login} />;
+  }
 
   // Launch pre-workout vibe check when starting from builder
   const handleRequestStartWorkout = (exercises, methodology) => {
@@ -85,6 +96,9 @@ export function App() {
         toggleTheme={toggleTheme}
         streakDays={streakDays}
         isSessionActive={session.isActive}
+        currentUser={currentUser}
+        isAdmin={isAdmin}
+        onLogout={logout}
       />
 
       {/* Main Content Router View */}
@@ -119,6 +133,14 @@ export function App() {
           <EvolutionAnalytics
             loadLogHooks={loadLogHooks}
             profileHooks={profileHooks}
+          />
+        )}
+
+        {activeTab === 'admin' && isAdmin && (
+          <AdminPanel
+            authorizedList={authorizedList}
+            onAddEmail={addAuthorizedEmail}
+            onRemoveEmail={removeAuthorizedEmail}
           />
         )}
       </main>

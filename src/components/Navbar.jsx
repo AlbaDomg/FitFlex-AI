@@ -1,7 +1,7 @@
 import React from 'react';
-import { Dumbbell, Sparkles, Flame, Moon, Sun, Activity, Trophy } from 'lucide-react';
+import { Dumbbell, Sparkles, Flame, Moon, Sun, Activity, Trophy, ShieldCheck, LogOut, User } from 'lucide-react';
 
-export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays, isSessionActive }) {
+export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays, isSessionActive, currentUser, isAdmin, onLogout }) {
   return (
     <header className="sticky top-0 z-40 w-full glass-panel border-b border-zinc-200 dark:border-zinc-800 backdrop-blur-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,10 +76,33 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
             >
               Evolución
             </button>
+
+            {isAdmin && (
+              <button
+                onClick={() => setActiveTab('admin')}
+                className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                  activeTab === 'admin'
+                    ? 'bg-cyan-500/10 text-cyan-500 font-semibold'
+                    : 'text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-zinc-200'
+                }`}
+              >
+                Membresías
+              </button>
+            )}
           </nav>
 
           {/* Right Status Badges & Controls */}
           <div className="flex items-center space-x-3">
+            {/* User Chip */}
+            {currentUser && (
+              <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold">
+                <User className="w-3.5 h-3.5 text-emerald-500" />
+                <span className="text-zinc-800 dark:text-zinc-200 max-w-[120px] truncate">
+                  {currentUser.username}
+                </span>
+              </div>
+            )}
+
             {/* Streak Counter */}
             <div className="flex items-center space-x-1.5 px-3 py-1.5 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-600 dark:text-orange-400 text-xs font-bold">
               <Flame className="w-4 h-4 text-orange-500 fill-orange-500 animate-pulse" />
@@ -93,6 +116,15 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
               title={theme === 'dark' ? 'Cambiar a Modo Claro' : 'Cambiar a Modo Oscuro'}
             >
               {theme === 'dark' ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-zinc-700" />}
+            </button>
+
+            {/* Logout Button */}
+            <button
+              onClick={onLogout}
+              className="p-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20 transition-colors"
+              title="Cerrar Sesión"
+            >
+              <LogOut className="w-5 h-5" />
             </button>
           </div>
 
@@ -140,6 +172,17 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
           <Trophy className="w-4 h-4 mb-0.5" />
           Evolución
         </button>
+        {isAdmin && (
+          <button
+            onClick={() => setActiveTab('admin')}
+            className={`flex flex-col items-center py-1 px-3 text-xs font-medium ${
+              activeTab === 'admin' ? 'text-cyan-400 font-bold' : 'text-zinc-500 dark:text-zinc-400'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4 mb-0.5" />
+            Admin
+          </button>
+        )}
       </div>
     </header>
   );

@@ -1,8 +1,5 @@
 import { useState, useEffect } from 'react';
 
-const STORAGE_LOGS_KEY = 'fitflex_load_logs_v1';
-const STORAGE_BADGES_KEY = 'fitflex_badges_v1';
-
 const INITIAL_BADGES = [
   { id: 'b1', title: 'Genoma Inicial', desc: 'Completaste la configuración del Perfil IA', icon: 'Sparkles', unlocked: false },
   { id: 'b2', title: 'Primer Empuje', desc: 'Completaste tu primera sesión de entrenamiento', icon: 'Dumbbell', unlocked: false },
@@ -12,7 +9,11 @@ const INITIAL_BADGES = [
   { id: 'b6', title: 'Modo Bestia', desc: 'Completaste un entrenamiento con Nivel de Energía Alto ⚡⚡⚡', icon: 'Trophy', unlocked: false }
 ];
 
-export function useLoadLog() {
+export function useLoadLog(userEmail = 'guest') {
+  const cleanEmail = userEmail ? userEmail.trim().toLowerCase() : 'guest';
+  const STORAGE_LOGS_KEY = `fitflex_logs_${cleanEmail}`;
+  const STORAGE_BADGES_KEY = `fitflex_badges_${cleanEmail}`;
+
   const [logs, setLogs] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_LOGS_KEY);
@@ -31,6 +32,19 @@ export function useLoadLog() {
     }
   });
 
+  // Re-sync when user email changes
+  useEffect(() => {
+    try {
+      const savedLogs = localStorage.getItem(STORAGE_LOGS_KEY);
+      setLogs(savedLogs ? JSON.parse(savedLogs) : []);
+
+      const savedBadges = localStorage.getItem(STORAGE_BADGES_KEY);
+      setBadges(savedBadges ? JSON.parse(savedBadges) : INITIAL_BADGES);
+    } catch (e) {
+      console.error('Failed to sync logs storage', e);
+    }
+  }, [cleanEmail]);
+
   // Save logs
   useEffect(() => {
     try {
@@ -38,7 +52,7 @@ export function useLoadLog() {
     } catch (e) {
       console.error('Failed to store logs', e);
     }
-  }, [logs]);
+  }, [logs, STORAGE_LOGS_KEY]);
 
   // Save badges
   useEffect(() => {
@@ -47,18 +61,15 @@ export function useLoadLog() {
     } catch (e) {
       console.error('Failed to store badges', e);
     }
-  }, [badges]);
+  }, [badges, STORAGE_BADGES_KEY]);
 
-  // Background auto-sync function when user completes a set in the In-Workout Player
   const addSetLog = (setLogData) => {
     const { exerciseId, exerciseName, muscleGroup, weight, reps, rpe = 8, methodology } = setLogData;
     
-    // Calculate 1RM estimate: Weight * (1 + Reps / 30)
     const numericWeight = parseFloat(weight) || 0;
     const numericReps = parseInt(reps) || 0;
     const estimated1RM = parseFloat((numericWeight * (1 + numericReps / 30)).toFixed(1));
 
-    // Check if this is a PR for this exercise
     const previousLogs = logs.filter(l => l.exerciseId === exerciseId);
     const maxPrevWeight = previousLogs.reduce((max, l) => Math.max(max, l.weight || 0), 0);
     const isPR = numericWeight > maxPrevWeight && previousLogs.length > 0;
@@ -79,13 +90,12 @@ export function useLoadLog() {
 
     setLogs(prev => [newLog, ...prev]);
 
-    // Check for badge unlocks
-    unlockBadge('b2'); // Primer Empuje
+    unlockBadge('b2');
     if (isPR) {
-      unlockBadge('b5'); // Sobrecarga Progresiva
+      unlockBadge('b5');
     }
     if (methodology === 'biseries') {
-      unlockBadge('b3'); // Maestro Biseries
+      unlockBadge('b3');
     }
 
     return newLog;
@@ -97,14 +107,12 @@ export function useLoadLog() {
     );
   };
 
-  // Get historical data for a specific exercise for overload graphs
   const getExerciseHistory = (exerciseId) => {
     return logs
       .filter(l => l.exerciseId === exerciseId)
       .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
   };
 
-  // Get volume distribution per muscle group
   const getVolumeByMuscle = () => {
     const volumeMap = {};
     logs.forEach(log => {

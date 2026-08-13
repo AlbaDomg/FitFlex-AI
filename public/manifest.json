@@ -1,16 +1,17 @@
 {
   "short_name": "FitFlex AI",
-  "name": "FitFlex AI - Generador de Entrenamientos Inteligente",
+  "name": "FitFlex AI - Entrenamientos Inteligentes",
   "icons": [
     {
       "src": "/favicon.svg",
       "type": "image/svg+xml",
-      "sizes": "512x512"
+      "sizes": "512x512 192x192",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "/",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#09090b",
+  "theme_color": "#09090b",
   "display": "standalone",
   "orientation": "portrait"
 }

@@ -1,4 +1,4 @@
-// FitFlex AI Exercise Database
+// FitFlex AI Exercise Database & Smart Load Engine
 // Rich set of exercises categorised by muscle group, equipment, and compatible methodologies
 
 export const MUSCLE_SPANISH_NAMES = {
@@ -72,6 +72,71 @@ export const METHODOLOGIES = [
     defaultRestBetweenExercisesSec: 15
   }
 ];
+
+// Smart Algorithmic Personalised Load & Reps Calculator
+export function calculatePersonalizedLoad(exercise, gender = 'Hombre', bodyWeightKg = 70, experienceLevel = 'intermediate', goal = 'Hipertrofia') {
+  const isFemale = gender === 'Mujer';
+  const bw = parseFloat(bodyWeightKg) || 70;
+
+  // Experience level multiplier
+  let expMultiplier = 0.85; // default intermediate
+  if (experienceLevel === 'beginner') expMultiplier = 0.55;
+  if (experienceLevel === 'advanced') expMultiplier = 1.2;
+
+  // Base strength ratio by exercise category & equipment
+  let baseRatio = 0.5;
+
+  if (exercise.equipment === 'bodyweight') {
+    return {
+      suggestedWeightKg: 0,
+      targetReps: goal.includes('Definición') ? '15-20' : '10-12',
+      defaultRepsNum: 12
+    };
+  }
+
+  // Upper Body Push (Bench Press, Press Militar)
+  if (exercise.muscleGroup === 'chest' || exercise.muscleGroup === 'shoulders') {
+    baseRatio = isFemale ? 0.35 : 0.65;
+  }
+  // Upper Body Pull (Remo, Jalón, Bíceps)
+  else if (exercise.muscleGroup === 'back' || exercise.muscleGroup === 'biceps') {
+    baseRatio = isFemale ? 0.4 : 0.6;
+  }
+  // Triceps / Arms Isolations
+  else if (exercise.muscleGroup === 'triceps') {
+    baseRatio = isFemale ? 0.25 : 0.4;
+  }
+  // Lower Body (Sentadillas, Peso Muerto, Hip Thrust)
+  else if (exercise.muscleGroup === 'quads' || exercise.muscleGroup === 'hamstrings') {
+    baseRatio = isFemale ? 0.7 : 0.9;
+  }
+
+  // Equipment correction (Dumbbells are per hand, so ratio is halved)
+  if (exercise.equipment === 'dumbbells') {
+    baseRatio = baseRatio * 0.4;
+  }
+
+  let calculatedKg = bw * baseRatio * expMultiplier;
+
+  // Round to nearest 2.5kg step
+  calculatedKg = Math.max(2.5, Math.round(calculatedKg / 2.5) * 2.5);
+
+  let targetReps = '8-10';
+  let defaultRepsNum = 10;
+  if (goal.includes('Definición') || goal.includes('Grasa')) {
+    targetReps = '12-15';
+    defaultRepsNum = 12;
+  } else if (goal.includes('Fuerza')) {
+    targetReps = '6-8';
+    defaultRepsNum = 8;
+  }
+
+  return {
+    suggestedWeightKg: calculatedKg,
+    targetReps,
+    defaultRepsNum
+  };
+}
 
 export const EXERCISE_DATABASE = [
   // CHEST

@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import { Play, Pause, SkipForward, SkipBack, Plus, Minus, Check, Clock, Sparkles, Flame, Volume2, ShieldCheck, Trophy, HelpCircle, X, RotateCcw, ChevronRight, ChevronLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { getMuscleSpanishName } from '../data/exerciseDatabase';
+import { getMuscleSpanishName, calculatePersonalizedLoad } from '../data/exerciseDatabase';
 
-export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }) {
+export function InWorkoutPlayer({ sessionHooks, profile, onFinishWorkout, onGoToBuilder }) {
   const {
     session,
     completeActiveSet,
@@ -43,19 +43,34 @@ export function InWorkoutPlayer({ sessionHooks, onFinishWorkout, onGoToBuilder }
   const exerciseA1 = isBiseries ? exercises[Math.floor(currentLinearIndex / 2) * 2] : null;
   const exerciseA2 = isBiseries ? exercises[Math.floor(currentLinearIndex / 2) * 2 + 1] : null;
 
-  // Active Set Form Inputs
-  const [weightInput, setWeightInput] = useState(activeExerciseObj?.defaultWeightKg || 50);
-  const [repsInput, setRepsInput] = useState(10);
+  // Active Set Form Inputs (with Smart AI Personalised Initial Values)
+  const initialSmartLoad = activeExerciseObj ? calculatePersonalizedLoad(
+    activeExerciseObj,
+    profile?.gender || 'Hombre',
+    profile?.weight || 70,
+    profile?.experienceLevel || 'intermediate',
+    profile?.goal || 'Hipertrofia'
+  ) : null;
+
+  const [weightInput, setWeightInput] = useState(initialSmartLoad?.suggestedWeightKg || 50);
+  const [repsInput, setRepsInput] = useState(initialSmartLoad?.defaultRepsNum || 10);
   const [rpeInput, setRpeInput] = useState(8);
   const [showTipsModal, setShowTipsModal] = useState(false);
 
   // Sync inputs when active exercise changes
   React.useEffect(() => {
     if (activeExerciseObj) {
-      setWeightInput(activeExerciseObj.defaultWeightKg || 40);
-      setRepsInput(10);
+      const smart = calculatePersonalizedLoad(
+        activeExerciseObj,
+        profile?.gender || 'Hombre',
+        profile?.weight || 70,
+        profile?.experienceLevel || 'intermediate',
+        profile?.goal || 'Hipertrofia'
+      );
+      setWeightInput(smart.suggestedWeightKg);
+      setRepsInput(smart.defaultRepsNum);
     }
-  }, [currentLinearIndex]);
+  }, [currentLinearIndex, activeExerciseObj, profile]);
 
   // Fire celebratory confetti when workout completes
   React.useEffect(() => {

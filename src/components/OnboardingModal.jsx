@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, ArrowRight, Check, ShieldAlert, Clock, Dumbbell, Calendar, Target, User } from 'lucide-react';
+import { Sparkles, ArrowRight, Check, ShieldAlert, Clock, Dumbbell, Calendar, Target, User, Zap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function OnboardingModal({ isOpen, onClose, onSave, initialProfile }) {
@@ -8,6 +8,7 @@ export function OnboardingModal({ isOpen, onClose, onSave, initialProfile }) {
     gender: initialProfile?.gender || 'Hombre',
     age: initialProfile?.age || 26,
     weight: initialProfile?.weight || 76,
+    experienceLevel: initialProfile?.experienceLevel || 'intermediate',
     goal: initialProfile?.goal || 'Hipertrofia / Agrandar Músculo',
     daysPerWeek: initialProfile?.daysPerWeek || 4,
     sessionTime: initialProfile?.sessionTime || 45,
@@ -71,12 +72,12 @@ export function OnboardingModal({ isOpen, onClose, onSave, initialProfile }) {
           </div>
         </div>
 
-        {/* Step 1: Biometrics & Goal */}
+        {/* Step 1: Biometrics, Experience & Goal */}
         {step === 1 && (
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-5">
             <div>
               <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2 block">
-                Género & Edad
+                Género & Biometría
               </label>
               <div className="grid grid-cols-2 gap-3">
                 {['Hombre', 'Mujer'].map(g => (
@@ -119,6 +120,35 @@ export function OnboardingModal({ isOpen, onClose, onSave, initialProfile }) {
                   onChange={e => setFormData({ ...formData, weight: e.target.value })}
                   className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-emerald-400 font-bold focus:outline-none focus:border-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                 />
+              </div>
+            </div>
+
+            {/* Experience Level Selector for Smart Load Recommendation */}
+            <div>
+              <label className="text-xs font-semibold uppercase tracking-wider text-zinc-400 mb-2 block flex items-center justify-between">
+                <span>Nivel de Experiencia en Fuerza</span>
+                <span className="text-[10px] text-emerald-400 font-normal">Calculador de Pesos IA</span>
+              </label>
+              <div className="grid grid-cols-3 gap-2.5">
+                {[
+                  { id: 'beginner', title: 'Principiante', desc: '< 6 meses' },
+                  { id: 'intermediate', title: 'Intermedio', desc: '6m - 2 años' },
+                  { id: 'advanced', title: 'Avanzado', desc: '+2 años' }
+                ].map(lvl => (
+                  <button
+                    key={lvl.id}
+                    type="button"
+                    onClick={() => setFormData({ ...formData, experienceLevel: lvl.id })}
+                    className={`p-3 rounded-xl border text-center transition-all ${
+                      formData.experienceLevel === lvl.id
+                        ? 'border-emerald-500 bg-emerald-500/10 text-emerald-400 font-bold shadow-sm'
+                        : 'border-zinc-800 bg-zinc-950 text-zinc-400 hover:border-zinc-700'
+                    }`}
+                  >
+                    <div className="text-xs font-bold">{lvl.title}</div>
+                    <div className="text-[10px] text-zinc-500 mt-0.5">{lvl.desc}</div>
+                  </button>
+                ))}
               </div>
             </div>
 
@@ -280,7 +310,7 @@ export function OnboardingModal({ isOpen, onClose, onSave, initialProfile }) {
                 <span>Generación de División Semanal IA</span>
               </div>
               <p className="text-xs text-emerald-200/90 leading-relaxed">
-                Basado en {formData.daysPerWeek} días/semana con equipamiento de {formData.equipment === 'gym' ? 'Gimnasio Completo' : formData.equipment === 'dumbbells' ? 'Mancuernas' : 'Peso Corporal'}, generaremos una división estructurada con alternancia de grupos antagonisticos.
+                Basado en {formData.daysPerWeek} días/semana con nivel {formData.experienceLevel === 'beginner' ? 'Principiante' : formData.experienceLevel === 'advanced' ? 'Avanzado' : 'Intermedio'} y {formData.equipment === 'gym' ? 'Gimnasio Completo' : formData.equipment === 'dumbbells' ? 'Mancuernas' : 'Peso Corporal'}, la IA calculará automáticamente tus repeticiones y cargas personalizadas.
               </p>
             </div>
           </motion.div>

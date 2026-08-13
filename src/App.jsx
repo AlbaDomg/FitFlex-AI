@@ -124,6 +124,7 @@ export function App() {
         {activeTab === 'player' && (
           <InWorkoutPlayer
             sessionHooks={sessionHooks}
+            profile={profile}
             onFinishWorkout={handleFinishWorkout}
             onGoToBuilder={() => setActiveTab('builder')}
           />

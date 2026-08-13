@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Sparkles, Dumbbell, Zap, Layers, RefreshCw, Trash2, ArrowUp, ArrowDown, Play, Check, Flame, ShieldAlert } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MUSCLE_GROUPS, METHODOLOGIES, EXERCISE_DATABASE, getRecommendedExercises, getMuscleSpanishName } from '../data/exerciseDatabase';
+import { MUSCLE_GROUPS, METHODOLOGIES, EXERCISE_DATABASE, getRecommendedExercises, getMuscleSpanishName, calculatePersonalizedLoad } from '../data/exerciseDatabase';
 
 export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
   const [selectedMuscles, setSelectedMuscles] = useState(['chest', 'back']);
@@ -269,12 +269,19 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
                   {/* Right Actions & Meta */}
                   <div className="flex items-center justify-between sm:justify-end space-x-3 border-t sm:border-t-0 pt-3 sm:pt-0 border-zinc-100 dark:border-zinc-800">
                     <div className="text-left sm:text-right">
-                      <div className="text-xs font-bold text-zinc-900 dark:text-zinc-200">
-                        {ex.defaultSets || 3} Series x {ex.defaultReps || '10'} Reps
-                      </div>
-                      <div className="text-[11px] text-zinc-400 font-medium">
-                        Carga sugerida: {ex.defaultWeightKg ? `${ex.defaultWeightKg} kg` : 'Peso Corporal'}
-                      </div>
+                      {(() => {
+                        const smartLoad = calculatePersonalizedLoad(ex, profile?.gender, profile?.weight, profile?.experienceLevel, profile?.goal);
+                        return (
+                          <>
+                            <div className="text-xs font-bold text-zinc-900 dark:text-zinc-200">
+                              {ex.defaultSets || 3} Series x {smartLoad.targetReps} Reps
+                            </div>
+                            <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
+                              Carga IA: {smartLoad.suggestedWeightKg > 0 ? `${smartLoad.suggestedWeightKg} kg` : 'Peso Corporal'}
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
 
                     <div className="flex items-center space-x-1">

@@ -13,6 +13,7 @@ export function useUserProfile(userEmail = 'guest') {
     gender: 'Hombre',
     age: 26,
     weight: 70,
+    experienceLevel: 'intermediate',
     goal: 'Hipertrofia / Agrandar Músculo',
     daysPerWeek: 4,
     sessionTime: 45,

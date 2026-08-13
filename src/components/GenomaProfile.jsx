@@ -18,21 +18,21 @@ export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = 
   return (
     <div className="space-y-8 max-w-6xl mx-auto px-4 py-6">
       
-      {/* Clean & Sleek Header Banner */}
-      <div className="relative rounded-3xl bg-gradient-to-r from-zinc-900 via-zinc-950 to-black border border-zinc-800 p-6 sm:p-8 overflow-hidden shadow-xl">
+      {/* Clean & Sleek Header Banner with Light Mode Adaptation */}
+      <div className="relative rounded-3xl bg-gradient-to-r from-emerald-50 via-slate-50 to-cyan-50 border border-emerald-500/20 dark:bg-gradient-to-r dark:from-zinc-900 dark:via-zinc-950 dark:to-black dark:border-zinc-800 p-6 sm:p-8 overflow-hidden shadow-lg transition-colors">
         <div className="absolute top-0 right-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold mb-3">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-700 dark:text-emerald-400 text-xs font-bold mb-3">
               <Sparkles className="w-3.5 h-3.5" />
               <span>Genoma Activo: Algoritmo v2.4</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight">
               Perfil de Entrenamiento & División IA
             </h1>
-            <p className="text-xs sm:text-sm text-zinc-600 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-zinc-700 dark:text-zinc-400 mt-1 max-w-2xl leading-relaxed font-medium">
               Plan semanal adaptativo optimizado para {goal} con sobrecarga progresiva y recuperación optimizada.
             </p>
           </div>
@@ -88,10 +88,10 @@ export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = 
 
       {/* Protected Injury Zones */}
       {protectedZones && protectedZones.length > 0 && (
-        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-300 flex items-center space-x-3">
-          <ShieldAlert className="w-5 h-5 text-amber-400 flex-shrink-0" />
+        <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 flex items-center space-x-3">
+          <ShieldAlert className="w-5 h-5 text-amber-500 flex-shrink-0" />
           <div className="text-xs">
-            <span className="font-bold text-amber-400">Protecciones de Lesión Activas: </span>
+            <span className="font-bold text-amber-600 dark:text-amber-400">Protecciones de Lesión Activas: </span>
             <span>El sistema evitará automáticamente ejercicios de alto impacto en {protectedZones.join(', ')}.</span>
           </div>
         </div>
@@ -109,7 +109,7 @@ export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = 
               Toca cualquier tarjeta para generar e iniciar el entrenamiento de ese día en vivo.
             </p>
           </div>
-          <span className="text-xs text-emerald-500 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 hidden sm:inline-block">
+          <span className="text-xs text-emerald-600 dark:text-emerald-500 font-bold bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 hidden sm:inline-block">
             Toca una tarjeta para Entrenar
           </span>
         </div>
@@ -137,17 +137,17 @@ export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = 
                   <div className="flex items-center justify-between text-xs font-bold uppercase tracking-wider mb-2">
                     <span className="text-zinc-500 dark:text-zinc-400">{item.day}</span>
                     {isCompletedDay ? (
-                      <span className="flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px]">
+                      <span className="flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[10px]">
                         <CheckCircle className="w-3 h-3" />
                         <span>Completado</span>
                       </span>
                     ) : isWorkoutDay ? (
-                      <span className="flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-[10px]">
-                        <Play className="w-2.5 h-2.5 fill-emerald-400" />
+                      <span className="flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 text-[10px]">
+                        <Play className="w-2.5 h-2.5 fill-emerald-500 dark:fill-emerald-400" />
                         <span>Iniciar</span>
                       </span>
                     ) : (
-                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 text-[10px]">
+                      <span className="px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 text-[10px]">
                         Descanso
                       </span>
                     )}
@@ -167,14 +167,14 @@ export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = 
                       {item.muscles.map(m => (
                         <span
                           key={m}
-                          className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 uppercase border dark:border-zinc-800"
+                          className="px-2 py-0.5 rounded-md bg-zinc-100 dark:bg-zinc-900 text-[10px] font-bold text-zinc-600 dark:text-zinc-300 uppercase border border-zinc-200 dark:border-zinc-800"
                         >
                           {getMuscleSpanishName(m)}
                         </span>
                       ))}
                     </div>
                   ) : (
-                    <span className="text-xs text-cyan-400 font-medium flex items-center space-x-1">
+                    <span className="text-xs text-cyan-600 dark:text-cyan-400 font-medium flex items-center space-x-1">
                       <HeartPulse className="w-3.5 h-3.5" />
                       <span>Recuperación muscular</span>
                     </span>
@@ -189,20 +189,20 @@ export function GenomaProfile({ profile, onSelectSplitDay, completedSplitDays = 
       {/* Rest Day Modal Info */}
       {selectedRestDay && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/80 backdrop-blur-md">
-          <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl text-zinc-100 space-y-4 relative text-center">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl text-zinc-900 dark:text-zinc-100 space-y-4 relative text-center">
             <button
               onClick={() => setSelectedRestDay(null)}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-zinc-800 text-zinc-400"
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <div className="w-14 h-14 rounded-full bg-cyan-500/20 text-cyan-400 flex items-center justify-center mx-auto ring-8 ring-cyan-500/10">
+            <div className="w-14 h-14 rounded-full bg-cyan-500/20 text-cyan-500 dark:text-cyan-400 flex items-center justify-center mx-auto ring-8 ring-cyan-500/10">
               <HeartPulse className="w-7 h-7" />
             </div>
 
-            <h3 className="text-xl font-extrabold text-zinc-50">{selectedRestDay.day}: Recuperación Activa</h3>
-            <p className="text-xs text-zinc-400 leading-relaxed bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
+            <h3 className="text-xl font-extrabold text-zinc-900 dark:text-zinc-50">{selectedRestDay.day}: Recuperación Activa</h3>
+            <p className="text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed bg-zinc-50 dark:bg-zinc-950 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800">
               💡 La IA recomienda hoy hidratación adecuada (2.5L de agua), movilidad articular suave (15 min) y descanso profundo para promover la síntesis proteica muscular.
             </p>
 

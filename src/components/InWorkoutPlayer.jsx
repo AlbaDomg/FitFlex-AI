@@ -178,8 +178,8 @@ export function InWorkoutPlayer({ sessionHooks, profile, onFinishWorkout, onGoTo
             <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
               Reproductor en Vivo
             </span>
-            <div className="text-xs font-semibold text-zinc-200 capitalize">
-              Modo {methodology} • Vibe {vibe}
+            <div className="text-xs font-semibold text-zinc-200">
+              {methodology === 'classic' ? 'Hipertrofia Clásica' : methodology === 'biseries' ? 'Biseries Antagonistas' : methodology === 'circuit' ? 'Circuito Funcional / EMOM' : 'Drop-Sets'} • Vibe {vibe}
             </div>
           </div>
         </div>

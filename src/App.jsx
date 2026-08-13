@@ -42,7 +42,7 @@ export function App() {
 
   // Launch pre-workout vibe check when starting from builder
   const handleRequestStartWorkout = (exercises, methodology) => {
-    setPendingWorkoutConfig({ exercises, methodology, dayLabel: null });
+    setPendingWorkoutConfig({ exercises, methodology, dayLabel: null, isCustomOverride: true });
     setIsVibeCheckOpen(true);
   };
 
@@ -66,7 +66,12 @@ export function App() {
 
   const handleConfirmVibe = (vibe, sessionDuration) => {
     if (pendingWorkoutConfig) {
-      startSession(pendingWorkoutConfig.exercises, pendingWorkoutConfig.methodology, vibe, sessionDuration);
+      // Re-evaluate optimal methodology for the specific session duration chosen
+      const effectiveMethodology = pendingWorkoutConfig.isCustomOverride
+        ? pendingWorkoutConfig.methodology
+        : getRecommendedMethodologyForTime(sessionDuration);
+
+      startSession(pendingWorkoutConfig.exercises, effectiveMethodology, vibe, sessionDuration);
       setIsVibeCheckOpen(false);
       setActiveTab('player');
     }

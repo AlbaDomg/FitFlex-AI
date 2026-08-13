@@ -46,6 +46,10 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
   };
 
   React.useEffect(() => {
+    setSelectedMethodology(getRecommendedMethodologyForTime(profile?.sessionTime || 45));
+  }, [profile?.sessionTime]);
+
+  React.useEffect(() => {
     generateAIRoutine();
   }, [selectedMuscles, selectedMethodology, recommendedPool]);
 

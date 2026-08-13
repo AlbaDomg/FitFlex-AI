@@ -13,15 +13,9 @@ export function Navbar({ activeTab, setActiveTab, theme, toggleTheme, streakDays
               <Dumbbell className="w-6 h-6 text-zinc-950 font-bold" />
             </div>
             <div>
-              <div className="flex items-center space-x-2">
-                <span className="font-extrabold text-xl tracking-tight text-zinc-900 dark:text-zinc-50">
-                  FitFlex <span className="text-emerald-500 dark:text-emerald-400">AI</span>
-                </span>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                  <Sparkles className="w-3 h-3 mr-1" />
-                  Genoma v2
-                </span>
-              </div>
+              <span className="font-extrabold text-xl tracking-tight text-zinc-900 dark:text-zinc-50">
+                FitFlex <span className="text-emerald-500 dark:text-emerald-400">AI</span>
+              </span>
             </div>
           </div>
 

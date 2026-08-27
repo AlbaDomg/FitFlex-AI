@@ -13,7 +13,8 @@ export function CustomWorkoutBuilder({ profile, onStartWorkout }) {
     return getRecommendedExercises({
       equipment: profile?.equipment || 'gym',
       muscleGroups: selectedMuscles,
-      protectedZones: profile?.protectedZones || []
+      protectedZones: profile?.protectedZones || [],
+      sessionTime: profile?.sessionTime || 45
     });
   }, [profile, selectedMuscles]);
 

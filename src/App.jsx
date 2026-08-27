@@ -61,7 +61,8 @@ export function App() {
     let recommended = getRecommendedExercises({
       equipment: profile.equipment || 'gym',
       muscleGroups: dayItem.muscles,
-      protectedZones: profile.protectedZones || []
+      protectedZones: profile.protectedZones || [],
+      sessionTime: profile.sessionTime || 45
     });
 
     const methodology = getRecommendedMethodologyForTime(profile.sessionTime || 45);
@@ -76,6 +77,7 @@ export function App() {
       exercises: recommended,
       methodology,
       dayLabel: dayItem.day,
+      dayMuscles: dayItem.muscles,
       isFullBody
     });
     setIsVibeCheckOpen(true);
@@ -88,7 +90,15 @@ export function App() {
         ? pendingWorkoutConfig.methodology
         : getRecommendedMethodologyForTime(sessionDuration);
 
-      let finalExercises = [...pendingWorkoutConfig.exercises];
+      let finalExercises = pendingWorkoutConfig.isCustomOverride
+        ? [...pendingWorkoutConfig.exercises]
+        : getRecommendedExercises({
+            equipment: profile.equipment || 'gym',
+            muscleGroups: pendingWorkoutConfig.dayMuscles || [],
+            protectedZones: profile.protectedZones || [],
+            sessionTime: sessionDuration
+          });
+
       const isFullBody = pendingWorkoutConfig.isFullBody ||
         (finalExercises.some(ex => isUpperBodyExercise(ex)) && finalExercises.some(ex => isLowerBodyExercise(ex)));
 

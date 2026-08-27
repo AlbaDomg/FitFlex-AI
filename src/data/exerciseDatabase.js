@@ -628,8 +628,19 @@ export const EXERCISE_DATABASE = [
   }
 ];
 
-export function getRecommendedExercises({ equipment = 'gym', muscleGroups = [], protectedZones = [] }) {
-  return EXERCISE_DATABASE.filter(ex => {
+export function getRecommendedExercises({ equipment = 'gym', muscleGroups = [], protectedZones = [], sessionTime = 45 }) {
+  const mins = parseInt(sessionTime) || 45;
+  let targetCount = 6;
+  if (mins <= 30) {
+    targetCount = 4;
+  } else if (mins >= 90) {
+    targetCount = 8;
+  } else {
+    targetCount = 6;
+  }
+
+  // 1. Filter valid candidates matching equipment and safety rules
+  const candidates = EXERCISE_DATABASE.filter(ex => {
     if (equipment === 'bodyweight' && ex.equipment !== 'bodyweight') return false;
     if (equipment === 'dumbbells' && ex.equipment === 'gym') return false;
 
@@ -641,6 +652,52 @@ export function getRecommendedExercises({ equipment = 'gym', muscleGroups = [], 
 
     return true;
   });
+
+  if (candidates.length === 0) return [];
+
+  // 2. Group candidate exercises by muscle group
+  const groupedByMuscle = {};
+  candidates.forEach(ex => {
+    if (!groupedByMuscle[ex.muscleGroup]) {
+      groupedByMuscle[ex.muscleGroup] = [];
+    }
+    groupedByMuscle[ex.muscleGroup].push(ex);
+  });
+
+  const muscleKeys = Object.keys(groupedByMuscle);
+  if (muscleKeys.length === 0) return candidates.slice(0, targetCount);
+
+  // 3. Round-robin selection to guarantee balanced representation for all target muscles
+  const selected = [];
+  const musclePointers = {};
+  muscleKeys.forEach(m => { musclePointers[m] = 0; });
+
+  let addedInPass = true;
+  while (selected.length < targetCount && addedInPass) {
+    addedInPass = false;
+    for (const m of muscleKeys) {
+      if (selected.length >= targetCount) break;
+      const list = groupedByMuscle[m];
+      const idx = musclePointers[m];
+      if (idx < list.length) {
+        selected.push(list[idx]);
+        musclePointers[m] = idx + 1;
+        addedInPass = true;
+      }
+    }
+  }
+
+  // 4. Ensure even count (pairs) if possible for clean biseries
+  if (selected.length > 2 && selected.length % 2 !== 0 && selected.length < candidates.length) {
+    const remaining = candidates.find(c => !selected.some(s => s.id === c.id));
+    if (remaining) {
+      selected.push(remaining);
+    } else {
+      selected.pop();
+    }
+  }
+
+  return selected;
 }
 
 export const UPPER_BODY_MUSCLES = ['chest', 'back', 'shoulders', 'biceps', 'triceps'];

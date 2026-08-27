@@ -9,6 +9,8 @@ import { VibeCheckModal } from './components/VibeCheckModal';
 import { LoginScreen } from './components/LoginScreen';
 import { AdminPanel } from './components/AdminPanel';
 import { SettingsModal } from './components/SettingsModal';
+import { AICoachModal } from './components/AICoachModal';
+import { Bot, Sparkles } from 'lucide-react';
 
 import { useAuth } from './hooks/useAuth';
 import { useUserProfile } from './hooks/useUserProfile';
@@ -24,6 +26,7 @@ export function App() {
   const [isOnboardingOpen, setIsOnboardingOpen] = useState(false);
   const [isVibeCheckOpen, setIsVibeCheckOpen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [isCoachOpen, setIsCoachOpen] = useState(false);
   const [pendingWorkoutConfig, setPendingWorkoutConfig] = useState(null);
 
   // Core Custom State Management Hooks Scoped to Active User Email
@@ -115,7 +118,11 @@ export function App() {
   };
 
   return (
-    <div className={`min-h-screen bg-slate-50 dark:bg-black text-zinc-900 dark:text-zinc-50 font-sans transition-colors duration-250 selection:bg-emerald-500 selection:text-zinc-950`}>
+    <div className="min-h-screen bg-slate-100 dark:bg-[#05070d] sports-bg-pattern text-slate-900 dark:text-zinc-100 font-sans transition-colors duration-250 selection:bg-emerald-500 selection:text-zinc-950 relative overflow-x-hidden">
+      {/* Dynamic Ambient Neon Glow Accents */}
+      <div className="fixed top-0 left-1/4 w-[500px] h-[500px] bg-emerald-500/10 dark:bg-emerald-500/15 rounded-full blur-[120px] pointer-events-none -z-10" />
+      <div className="fixed bottom-10 right-1/4 w-[500px] h-[500px] bg-cyan-500/10 dark:bg-cyan-500/15 rounded-full blur-[120px] pointer-events-none -z-10" />
+
       {/* Navbar Header */}
       <Navbar
         activeTab={activeTab}
@@ -188,6 +195,22 @@ export function App() {
         defaultSessionTime={profile.sessionTime || 45}
       />
 
+      {/* Floating AI Coach Trigger FAB Button */}
+      <button
+        onClick={() => setIsCoachOpen(true)}
+        className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 px-4 py-3 rounded-full bg-gradient-to-r from-emerald-400 via-emerald-500 to-cyan-400 text-slate-950 font-black text-xs uppercase tracking-wider flex items-center space-x-2 shadow-2xl shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all transform border border-emerald-300/40 group"
+        title="Consultar al Coach FitFlex IA"
+      >
+        <div className="w-6 h-6 rounded-full bg-slate-950/20 flex items-center justify-center">
+          <Bot className="w-4 h-4 text-slate-950 group-hover:rotate-12 transition-transform" />
+        </div>
+        <span className="hidden sm:inline">COACH IA</span>
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-950 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-slate-950"></span>
+        </span>
+      </button>
+
       {/* Settings Modal */}
       <SettingsModal
         isOpen={isSettingsOpen}
@@ -197,6 +220,14 @@ export function App() {
         onOpenOnboarding={() => setIsOnboardingOpen(true)}
         onResetApp={handleResetApp}
         onLogout={logout}
+      />
+
+      {/* AI Coach Interactive Modal */}
+      <AICoachModal
+        isOpen={isCoachOpen}
+        onClose={() => setIsCoachOpen(false)}
+        userProfile={profile}
+        activeSession={session}
       />
     </div>
   );

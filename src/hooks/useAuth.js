@@ -5,24 +5,28 @@ const STORAGE_AUTH_USER_KEY = 'fitflex_active_user_v1';
 const STORAGE_AUTHORIZED_EMAILS_KEY = 'fitflex_authorized_list_v1';
 
 const DEFAULT_AUTHORIZED_LIST = [
-  { email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' }
+  { email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' },
+  { email: 'santiagobayonfernandez@gmail.com', username: 'SantiBayon', role: 'client', addedAt: '2026-08-26' }
 ];
 
 export function useAuth() {
   const [authorizedList, setAuthorizedList] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_AUTHORIZED_EMAILS_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved).filter(
-          item => item.email.toLowerCase() !== 'admin@fitflex.ai' && item.email.toLowerCase() !== 'pareja@fitflex.ai'
-        );
+      let parsed = saved ? JSON.parse(saved) : DEFAULT_AUTHORIZED_LIST;
 
-        if (!parsed.some(item => item.email.toLowerCase() === 'albadege94@gmail.com')) {
-          parsed.unshift({ email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' });
-        }
-        return parsed;
+      parsed = parsed.filter(
+        item => item.email.toLowerCase() !== 'admin@fitflex.ai' && item.email.toLowerCase() !== 'pareja@fitflex.ai'
+      );
+
+      if (!parsed.some(item => item.email.toLowerCase() === 'albadege94@gmail.com')) {
+        parsed.unshift({ email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' });
       }
-      return DEFAULT_AUTHORIZED_LIST;
+      if (!parsed.some(item => item.email.toLowerCase() === 'santiagobayonfernandez@gmail.com')) {
+        parsed.push({ email: 'santiagobayonfernandez@gmail.com', username: 'SantiBayon', role: 'client', addedAt: '2026-08-26' });
+      }
+
+      return parsed;
     } catch {
       return DEFAULT_AUTHORIZED_LIST;
     }
@@ -44,6 +48,9 @@ export function useAuth() {
       if (remoteList && Array.isArray(remoteList) && remoteList.length > 0) {
         if (!remoteList.some(item => item.email.toLowerCase() === 'albadege94@gmail.com')) {
           remoteList.unshift({ email: 'albadege94@gmail.com', username: 'Alba (Admin)', role: 'admin', addedAt: '2026-08-13' });
+        }
+        if (!remoteList.some(item => item.email.toLowerCase() === 'santiagobayonfernandez@gmail.com')) {
+          remoteList.push({ email: 'santiagobayonfernandez@gmail.com', username: 'SantiBayon', role: 'client', addedAt: '2026-08-26' });
         }
         setAuthorizedList(remoteList);
         localStorage.setItem(STORAGE_AUTHORIZED_EMAILS_KEY, JSON.stringify(remoteList));

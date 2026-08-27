@@ -4,7 +4,9 @@ import { motion } from 'framer-motion';
 
 export function SettingsModal({ isOpen, onClose, currentUser, onUpdateUsername, onOpenOnboarding, onResetApp, onLogout }) {
   const [usernameInput, setUsernameInput] = useState(currentUser?.username || '');
+  const [apiKeyInput, setApiKeyInput] = useState(() => localStorage.getItem('fitflex_custom_api_key') || '');
   const [isSaved, setIsSaved] = useState(false);
+  const [isApiKeySaved, setIsApiKeySaved] = useState(false);
 
   if (!isOpen) return null;
 
@@ -15,6 +17,17 @@ export function SettingsModal({ isOpen, onClose, currentUser, onUpdateUsername, 
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
     }
+  };
+
+  const handleSaveApiKey = (e) => {
+    e.preventDefault();
+    if (apiKeyInput.trim()) {
+      localStorage.setItem('fitflex_custom_api_key', apiKeyInput.trim());
+    } else {
+      localStorage.removeItem('fitflex_custom_api_key');
+    }
+    setIsApiKeySaved(true);
+    setTimeout(() => setIsApiKeySaved(false), 2000);
   };
 
   return (
@@ -64,6 +77,36 @@ export function SettingsModal({ isOpen, onClose, currentUser, onUpdateUsername, 
               {isSaved ? <Check className="w-3.5 h-3.5" /> : <span>Guardar</span>}
             </button>
           </div>
+        </form>
+
+        {/* 2. Custom API Key (Optional) */}
+        <form onSubmit={handleSaveApiKey} className="space-y-2 pt-2 border-t border-zinc-800">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-zinc-400 uppercase tracking-wider block">
+              API Key Personal de IA (Opcional)
+            </label>
+            <span className="text-[10px] text-emerald-400 font-semibold">Gratis activo por defecto</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <div className="relative flex-1">
+              <input
+                type="password"
+                placeholder="sk-... (Opcional OpenAI Key)"
+                value={apiKeyInput}
+                onChange={e => setApiKeyInput(e.target.value)}
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-3 py-2 text-xs text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500 font-mono"
+              />
+            </div>
+            <button
+              type="submit"
+              className="px-4 py-2 rounded-xl bg-cyan-500 text-zinc-950 text-xs font-bold hover:bg-cyan-400 transition-colors flex items-center space-x-1"
+            >
+              {isApiKeySaved ? <Check className="w-3.5 h-3.5" /> : <span>Guardar</span>}
+            </button>
+          </div>
+          <p className="text-[10px] text-zinc-400">
+            Si dejas el campo vacío, el Coach usará automáticamente el motor público de la nube gratis.
+          </p>
         </form>
 
         {/* 2. Actions List */}
